@@ -1,0 +1,4 @@
+type: skill
+name: kipi-cleanup-knowledge
+description: "Run maintenance and cleanup on Core-Knowledge. Use when Kipi selects [CL] or user says 'cleanup knowledge' or 'maintenance'."
+module: kipi

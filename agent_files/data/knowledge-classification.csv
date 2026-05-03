@@ -1,0 +1,27 @@
+content_type_id,display_name,description,source_patterns,target_chapter,extraction_rules,metadata_fields,priority,auto_classify
+transcript,Meeting Transcript,Transcribed audio/video meetings or calls,"*transcript*;*meeting*;*call*;*recording*;*.vtt;*.srt",decisions,Extract decisions/action items/key points/participants,participants;date;duration;topics,high,true
+requirements,Requirements Document,Product/technical requirements or specifications,"*requirement*;*spec*;*prd*;*functional*;*non-functional*",requirements,Extract must-have/should-have/nice-to-have items,priority_level;stakeholder;status,high,true
+architecture,Architecture Document,System design and architectural decisions,"*architecture*;*design*;*system*;*infrastructure*;*diagram*",architecture,Extract components/integrations/patterns/rationale,tech_stack;patterns;diagrams,high,true
+api_spec,API Specification,API documentation or contracts,"*api*;*openapi*;*swagger*;*graphql*;*.proto",api-reference,Extract endpoints/schemas/auth/examples,version;base_url;auth_type,high,true
+user_story,User Story,Agile user stories or tickets,"*story*;*ticket*;*issue*;*epic*;*feature*",requirements,Extract acceptance criteria/user value/tasks,story_points;sprint;assignee,medium,true
+meeting_notes,Meeting Notes,Handwritten or informal meeting notes,"*notes*;*minutes*;*standup*;*retro*;*planning*",decisions,Extract decisions/action items/blockers,date;attendees;type,medium,true
+code_review,Code Review,PR reviews or code feedback,"*review*;*pr*;*pull-request*;*feedback*",development,Extract issues found/suggestions/patterns,reviewer;files_changed;approval,medium,true
+research,Research Document,Research findings or analysis,"*research*;*analysis*;*findings*;*investigation*",research,Extract conclusions/data/methodology,topic;date;sources,medium,true
+onboarding,Onboarding Material,Developer or user onboarding docs,"*onboarding*;*getting-started*;*setup*;*quickstart*",getting-started,Extract setup steps/prerequisites/common issues,role_type;estimated_time,medium,true
+runbook,Runbook or Playbook,Operational procedures and playbooks,"*runbook*;*playbook*;*procedure*;*ops*;*incident*",operations,Extract steps/conditions/rollback/contacts,severity;services_affected,high,true
+postmortem,Incident Postmortem,Incident analysis and lessons learned,"*postmortem*;*incident*;*outage*;*failure*",operations,Extract timeline/root cause/action items,incident_date;severity;duration,high,true
+changelog,Changelog,Release notes and version history,"*changelog*;*release*;*whatsnew*;*version*",releases,Extract version/changes/breaking/deprecated,version;date;contributors,low,true
+adr,Architecture Decision Record,Documented architecture decisions,"*adr*;*decision*;*rfc*;*proposal*",architecture,Extract context/decision/consequences/alternatives,status;date;deciders,high,true
+config_doc,Configuration Documentation,Environment and config documentation,"*config*;*env*;*settings*;*variables*",configuration,Extract variables/defaults/descriptions/secrets,environment;required;sensitive,medium,true
+troubleshooting,Troubleshooting Guide,Problem resolution documentation,"*troubleshoot*;*debug*;*faq*;*problem*;*error*",troubleshooting,Extract symptoms/causes/solutions,error_codes;frequency,medium,true
+deployment,Deployment Documentation,Deployment processes and environments,"*deploy*;*release*;*ci-cd*;*pipeline*",deployment,Extract steps/environments/rollback/monitoring,environment;frequency;approvals,high,true
+data_model,Data Model Documentation,Database schemas and data dictionaries,"*schema*;*model*;*entity*;*database*;*erd*",data-models,Extract entities/relationships/constraints,database_type;version,high,true
+security,Security Documentation,Security policies and vulnerability info,"*security*;*vulnerability*;*audit*;*penetration*;*compliance*",security,Extract vulnerabilities/mitigations/policies,severity;compliance_standard,high,true
+test_plan,Test Plan or Strategy,Testing approach and coverage,"*test-plan*;*test-strategy*;*coverage*;*qa*",testing,Extract scope/approach/tools/coverage targets,test_types;coverage_target,medium,true
+interview,User Interview,User research and interview transcripts,"*interview*;*user-research*;*feedback*;*survey*",research,Extract pain points/needs/quotes/insights,participant_type;date;methodology,medium,true
+screenshot,Screenshot or Image,Visual captures with annotations,"*.png;*.jpg;*.jpeg;*.gif;*.webp",visual-reference,Extract context/annotations/related feature,feature;date;source,low,false
+log_file,Log File,Application or system logs,"*.log;*logs*;*output*;*.txt",troubleshooting,Extract errors/warnings/patterns/timestamps,log_level;service;time_range,low,false
+email,Email Thread,Email conversations and threads,"*email*;*mail*;*thread*;*correspondence*",communications,Extract decisions/action items/key participants,participants;date;thread_length,low,true
+slack,Chat/Slack Export,Team chat or Slack exports,"*slack*;*chat*;*discord*;*teams*",communications,Extract decisions/links/key discussions,channel;date_range;participants,low,true
+unknown,Unknown/General,Content that doesn't match other categories,N/A,inbox,Extract summary/topics/potential classification,detected_keywords,low,false
+

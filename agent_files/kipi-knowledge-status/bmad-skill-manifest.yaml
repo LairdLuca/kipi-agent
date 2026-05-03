@@ -1,0 +1,4 @@
+type: skill
+name: kipi-knowledge-status
+description: "Display Core-Knowledge status and coverage overview. Use when Kipi selects [ST] or user says 'knowledge status' or 'show status'."
+module: kipi

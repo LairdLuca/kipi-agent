@@ -1,0 +1,4 @@
+type: skill
+name: kipi-code-scan-document
+description: "Deep scan repository and create comprehensive documentation. Use when Kipi selects [CS] or user says 'code scan' or 'scan and document'."
+module: kipi

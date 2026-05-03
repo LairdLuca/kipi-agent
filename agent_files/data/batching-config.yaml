@@ -1,0 +1,297 @@
+# Kipi Batching Configuration
+# Applies BMAD workflow patterns for handling large codebases
+# Version: 1.0.0
+
+# ==============================================================================
+# BATCHING STRATEGY OVERVIEW
+# ==============================================================================
+# Batching is SUBFOLDER-BASED, not arbitrary file counts.
+# Each subfolder is a batch unit. This keeps related files together
+# and allows incremental writes with clear context boundaries.
+#
+# Pattern: Read subfolder → Extract info → Write output → Purge context → Next
+
+# ==============================================================================
+# SCAN LEVELS
+# ==============================================================================
+scan_levels:
+  quick:
+    description: "Pattern-based scan, no file reading"
+    reads_source_files: false
+    batching_enabled: false
+    targets:
+      - "package.json"
+      - "requirements.txt"
+      - "*.config.*"
+      - "README.md"
+      - ".env.example"
+    use_case: "Initial structure detection, dependency overview"
+
+  deep:
+    description: "Reads files in critical directories only"
+    reads_source_files: true
+    batching_enabled: true
+    targets: "critical_directories"  # References critical_directories section
+    use_case: "Standard documentation, most common usage"
+
+  exhaustive:
+    description: "Reads ALL source files recursively"
+    reads_source_files: true
+    batching_enabled: true
+    targets: "all"  # All directories except excluded
+    use_case: "Complete knowledge capture, migration prep"
+
+# ==============================================================================
+# BATCH ORGANIZATION
+# ==============================================================================
+batch_organization:
+  strategy: "subfolder"  # NEVER use arbitrary file counts
+
+  # How deep to go for subfolder batches
+  max_depth: 3
+
+  # Minimum files to warrant a separate batch
+  min_files_per_batch: 2
+
+  # If a subfolder has fewer files, merge with parent batch
+  merge_threshold: 2
+
+# ==============================================================================
+# CRITICAL DIRECTORIES BY PROJECT TYPE
+# ==============================================================================
+# Used when scan_level = "deep"
+# Kipi should detect project type and use appropriate patterns
+critical_directories:
+  web:
+    - "src/"
+    - "app/"
+    - "pages/"
+    - "components/"
+    - "api/"
+    - "lib/"
+    - "utils/"
+    - "hooks/"
+    - "services/"
+    - "styles/"
+    - "config/"
+
+  backend:
+    - "src/"
+    - "api/"
+    - "services/"
+    - "models/"
+    - "routes/"
+    - "controllers/"
+    - "middleware/"
+    - "handlers/"
+    - "repositories/"
+    - "domain/"
+    - "config/"
+
+  mobile:
+    - "src/"
+    - "app/"
+    - "screens/"
+    - "components/"
+    - "services/"
+    - "models/"
+    - "navigation/"
+    - "hooks/"
+    - "utils/"
+
+  cli:
+    - "src/"
+    - "cmd/"
+    - "cli/"
+    - "bin/"
+    - "lib/"
+    - "commands/"
+
+  library:
+    - "src/"
+    - "lib/"
+    - "core/"
+    - "packages/"
+
+  infra:
+    - "terraform/"
+    - "modules/"
+    - "k8s/"
+    - "charts/"
+    - "playbooks/"
+    - "stacks/"
+
+  generic:
+    - "src/"
+    - "lib/"
+    - "app/"
+    - "core/"
+    - "config/"
+
+# ==============================================================================
+# EXCLUDED DIRECTORIES
+# ==============================================================================
+# Always skip these - never include in any batch
+excluded_directories:
+  always:
+    - "node_modules/"
+    - ".git/"
+    - "dist/"
+    - "build/"
+    - ".next/"
+    - ".nuxt/"
+    - "coverage/"
+    - "__pycache__/"
+    - ".pytest_cache/"
+    - "venv/"
+    - ".venv/"
+    - "target/"
+    - ".cargo/"
+    - "vendor/"
+    - ".idea/"
+    - ".vscode/"
+    - "*.egg-info/"
+    - ".tox/"
+    - ".mypy_cache/"
+
+  # Skip unless specifically requested
+  optional:
+    - "test/"
+    - "tests/"
+    - "__tests__/"
+    - "spec/"
+    - "docs/"
+    - "examples/"
+    - "fixtures/"
+
+# ==============================================================================
+# FILE SIZE HANDLING
+# ==============================================================================
+file_handling:
+  # Files larger than this need special handling
+  large_file_threshold_loc: 5000
+
+  # For large files, use these strategies
+  large_file_strategies:
+    - strategy: "signature_only"
+      description: "Extract function/class signatures, skip implementation details"
+      applies_to:
+        - "generated files"
+        - "vendored code"
+
+    - strategy: "chunked_read"
+      description: "Read in 1000-line chunks, process incrementally"
+      applies_to:
+        - "critical source files"
+        - "main entry points"
+
+    - strategy: "skip_with_note"
+      description: "Skip file, note in documentation that it exists"
+      applies_to:
+        - "auto-generated files"
+        - "minified bundles"
+        - "lock files"
+
+  # File extensions to always skip
+  skip_extensions:
+    - ".min.js"
+    - ".min.css"
+    - ".map"
+    - ".lock"
+    - ".snap"
+    - ".svg"
+    - ".png"
+    - ".jpg"
+    - ".gif"
+    - ".ico"
+    - ".woff"
+    - ".woff2"
+    - ".ttf"
+    - ".eot"
+
+# ==============================================================================
+# CONTEXT MANAGEMENT
+# ==============================================================================
+# Rules for managing memory during batched processing
+context_management:
+  # After processing each batch
+  on_batch_complete:
+    action: "purge_and_summarize"
+    keep: "1-2 sentence summary"
+    write: "findings to disk immediately"
+    track: "batch completion in workflow-state.json"
+
+  # Summary format for retained context
+  summary_template: "{files_count} files in {folder_path} - {brief_description}"
+
+  # Maximum summaries to keep in context
+  max_retained_summaries: 20
+
+  # If exceeded, write summary index to disk and clear
+  overflow_action: "write_summary_index"
+
+# ==============================================================================
+# STATE TRACKING
+# ==============================================================================
+# How to track batch progress in workflow-state.json
+state_tracking:
+  batch_entry_schema:
+    path: "string"           # Subfolder path processed
+    files_scanned: "number"  # Count of files in batch
+    timestamp: "datetime"    # When batch completed
+    summary: "string"        # 1-2 sentence summary
+    status: "enum[completed|failed|skipped]"
+    error: "string|null"     # Error message if failed
+
+  # Track in workflow-state.json under:
+  state_key: "findings.batches_completed"
+
+  # Enable resume from interrupted batch
+  resumable: true
+  resume_from: "last_completed_batch"
+
+# ==============================================================================
+# WORKFLOW-SPECIFIC CONFIGURATIONS
+# ==============================================================================
+workflow_overrides:
+  repository-initialize:
+    default_scan_level: "quick"
+    batching_enabled: false
+    purpose: "Initial structure detection only"
+
+  code-scan-document:
+    default_scan_level: "deep"
+    batching_enabled: true
+    purpose: "Comprehensive documentation with batched file reading"
+
+  process-user-data:
+    batching_enabled: false  # Files processed individually
+    purpose: "Each user-data file is its own unit"
+
+# ==============================================================================
+# USAGE EXAMPLES
+# ==============================================================================
+# Example 1: Processing a large React app
+#
+# 1. Kipi detects project_type = "web" from package.json
+# 2. Using deep scan, identifies critical_directories.web
+# 3. For each subfolder in src/components/:
+#    - Read all .tsx files
+#    - Extract component info, props, hooks
+#    - Write to components chapter
+#    - Update state: {path: "src/components/ui/", files_scanned: 15, summary: "15 UI components - buttons, inputs, modals"}
+#    - Purge detailed component analysis from context
+#    - Move to next subfolder
+#
+# Example 2: Processing a Python backend
+#
+# 1. Kipi detects project_type = "backend" from requirements.txt
+# 2. Using deep scan, identifies critical_directories.backend
+# 3. For each subfolder in src/services/:
+#    - Read all .py files
+#    - Extract class definitions, API endpoints, dependencies
+#    - Write to services chapter
+#    - Update state: {path: "src/services/auth/", files_scanned: 5, summary: "5 files - JWT auth, OAuth2 flows, session mgmt"}
+#    - Purge detailed service analysis from context
+#    - Move to next subfolder
+

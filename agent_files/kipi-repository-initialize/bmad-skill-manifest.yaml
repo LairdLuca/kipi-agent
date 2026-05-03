@@ -1,0 +1,4 @@
+type: skill
+name: kipi-repository-initialize
+description: "Initialize Core-Knowledge structure for a repository. Use when Kipi selects [RI] or user says 'initialize core-knowledge' or 'repo init'."
+module: kipi

@@ -1,0 +1,4 @@
+type: skill
+name: kipi-developer-interview
+description: "Run a 10-question developer interview to fill knowledge gaps in Core-Knowledge. Use when Kipi selects [DI] or user says 'developer interview' or 'fill knowledge gaps'."
+module: kipi
