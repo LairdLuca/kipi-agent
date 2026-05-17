@@ -38,7 +38,17 @@ This includes the main `SKILL.md`, sub-skills (`kipi-*`), workflows, templates, 
 
 In your IDE, run `/kipi` (or open Kipi from the skill menu).
 
-On first activation, **kipi-install** runs automatically: it copies thin skill stubs from `ide_adapters/<your-ide>/` into the right place (e.g. `.cursor/skills/` for Cursor) and merges the rules block from `rules-template.md` into your project's rules file.
+On first activation, **kipi-install** runs automatically. It reads which IDE(s) BMad configured and, for each one:
+
+| IDE | Skill stubs go to | Rules block merged into |
+|-----|-------------------|-------------------------|
+| Cursor | `.cursor/skills/` | `.cursorrules` |
+| Claude Code | `.claude/skills/` | `CLAUDE.md` |
+| VS Code Copilot | — | `.github/copilot-instructions.md` |
+| Windsurf | — | `.windsurfrules` |
+| Cline / Roo | — | `AGENTS.md` |
+
+The rules **content** is the same everywhere — it lives in `agent_files/rules-template.md` and is copied into whichever file your IDE uses.
 
 To re-run or add another IDE later, use **[IN] Install** from Kipi's menu.
 
@@ -48,17 +58,13 @@ Tell `bmad-help`: "I installed the Kipi module, help me register it."
 
 Or ensure `_bmad/config.yaml` lists Kipi and `{user_name}` is set.
 
-### Legacy manual install (Cursor only)
-
-If auto-install is unavailable, you can still copy `cursor-skills/` to `.cursor/skills/` and merge `cursorrules-template` into `.cursorrules` by hand. Prefer Step 2 when possible.
-
 ---
 
 ## Usage
 
 ### Activate Kipi
 
-In Cursor, invoke the Kipi skill — say "talk to Kipi" or use `/kipi`.
+In your IDE, invoke Kipi — say "talk to Kipi" or use `/kipi` (or the equivalent slash command your IDE exposes after install).
 
 Kipi will check that BMad is installed, load your config, and present a menu:
 
@@ -147,14 +153,13 @@ After code changes, run `/kipi-update-core` or other agents will remind you via 
 kipi-agent/
 ├── agent_files/               # → copy to _bmad/kipi/ (canonical brain)
 │   ├── SKILL.md
-│   ├── ide_adapters/          # per-IDE stubs + rules (used by kipi-install)
+│   ├── rules-template.md      # IDE-agnostic rules (merged by kipi-install)
+│   ├── ide_adapters/          # per-IDE skill stubs + commands
 │   ├── kipi-install/
 │   ├── kipi-*/
 │   ├── workflows/
 │   └── ...
-├── cursor-skills/             # reference stubs (same as ide_adapters/cursor/skills/)
 ├── workshop/                  # participant prompts (install + agent builder)
-├── cursorrules-template       # legacy; prefer rules-template.md via kipi-install
 ├── START_HERE.md
 ├── LICENSE
 └── README.md
