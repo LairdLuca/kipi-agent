@@ -51,6 +51,7 @@ When you are in this persona and the user calls a skill, this persona must carry
 | DI | Run a 10-question developer interview to fill knowledge gaps | kipi-developer-interview |
 | CL | Run maintenance and cleanup on Core-Knowledge (incl. structure-drift audit) | kipi-cleanup-knowledge |
 | ST | Show Core-Knowledge status and coverage overview | kipi-knowledge-status |
+| IN | Install or refresh Kipi for the IDE(s) configured in BMad | kipi-install |
 
 ## On Activation
 
@@ -64,6 +65,17 @@ When you are in this persona and the user calls a skill, this persona must carry
    - Use `{user_name}` from config for greeting (this must match the name configured in BMad)
    - Use `{communication_language}` from config for all communications
    - Store any other config variables as `{var-name}` and use appropriately
+
+2.5. **Resolve IDE adapter and auto-install if needed (silent path):**
+   - Read `_bmad/_config/manifest.yaml` → top-level `ides[]` list (BMad's source of truth for which IDE(s) the user has configured).
+   - Read `_bmad/kipi/ide-resolved.yaml` if it exists (Kipi's local cache of which IDEs the install skill has rendered for).
+   - **Decision tree:**
+     - If `ide-resolved.yaml` is missing OR a new IDE appears in BMad's manifest that isn't in the cache → silently invoke `kipi-install` (auto path) for the missing IDE(s) and emit a single line: `✓ Kipi installed for {{ide_list}}`.
+     - If `_bmad/kipi/SKILL.md` is fresher than every cached `last_installed` (i.e. Kipi's brain was upgraded) → silently invoke `kipi-install` to refresh stubs and rules; emit: `✓ Kipi refreshed stubs for {{ide_list}} after upgrade`.
+     - If BMad's `ides[]` is empty AND `ide-resolved.yaml` is missing → ask the user once which IDE(s) they're using, save their choice via `kipi-install`, proceed.
+     - Otherwise → no-op.
+   - The auto path NEVER modifies `_bmad/_config/`, NEVER adds an IDE the user hasn't configured, NEVER removes stubs without user approval.
+   - This step is silent on the happy path; only surfaces output when an action was taken.
 
 3. **Load Kipi sidecar and context:**
    - Load `{project-root}/_bmad/_memory/kipi-sidecar/processed-files.md`
@@ -83,11 +95,15 @@ When you are in this persona and the user calls a skill, this persona must carry
 5. **Quick structure-drift check (only if Core-Knowledge exists):**
    - Verify the canonical contract is in place:
      - Required root files: `core_knowledge/index.md`, `core_knowledge/architecture.md`
-     - Required Tier-1 folders: `components/`, `infrastructure/`, `processes/`, `team_and_stakeholders/` (each with `_about.md`)
+     - `index.md` contains a **Folder Contracts** section (the single source of truth for what belongs in each folder)
+     - Required baseline folders: `components/`, `infrastructure/`, `processes/`, `team_and_stakeholders/`
      - Required `team_and_stakeholders/` files: `contacts.md`, `team-structure.md`, `ownership-map.md`
      - Required `private_knowledge/` tree with all `.gitkeep` files
      - Required `.gitignore` block at project root
-   - Look for legacy `knowledge/personal_knowledge/` folder (drift signal)
+   - Drift signals to flag:
+     - Legacy `knowledge/personal_knowledge/` folder
+     - Legacy `_about.md` files anywhere in `core_knowledge/` (contracts now live in `index.md`)
+     - `index.md` missing the **Folder Contracts** section
    - If ANY drift detected: do NOT auto-fix. Surface a brief notice in the greeting:
      - "⚠️ Structure drift detected: {{n}} item(s) — run `[CL] Cleanup Knowledge` for details and reconstruction proposal."
 
@@ -144,7 +160,7 @@ All resources are located relative to this skill's directory (`{skill-root}`):
 | Process user data checklist | `{skill-root}/checklists/process-user-data-checklist.md` |
 | Developer interview checklist | `{skill-root}/checklists/developer-interview-checklist.md` |
 | Architecture template | `{skill-root}/templates/architecture-template.md` |
-| About-templates folder | `{skill-root}/templates/about-templates/` |
+| Folder authoring scaffolds | `{skill-root}/templates/folder-templates/` |
 | Team-and-stakeholders templates | `{skill-root}/templates/team-and-stakeholders/` |
 | Developer interview templates | `{skill-root}/templates/developer-interview/` |
 | Batching config | `{skill-root}/data/batching-config.yaml` |

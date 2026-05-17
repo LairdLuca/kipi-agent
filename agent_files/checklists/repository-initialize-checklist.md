@@ -1,7 +1,7 @@
 # Repository Initialize Workflow — Validation Checklist
 
 **Workflow:** `repository-initialize`
-**Purpose:** Ensure the Tier-1 / Tier-2 Core-Knowledge structure is created correctly with `private_knowledge/` tree and gitignore guardrails.
+**Purpose:** Ensure the Core-Knowledge structure is created correctly with `private_knowledge/` tree and gitignore guardrails. Folder contracts are recorded **once** in `index.md`; per-folder `_about.md` files are no longer used.
 
 ---
 
@@ -12,6 +12,7 @@
 - [ ] If exists: asked user about fresh start vs incremental update
 - [ ] Sidecar files accessible (`_bmad/_memory/kipi-sidecar/`)
 - [ ] Noted whether legacy `knowledge/personal_knowledge/` exists (do NOT migrate here — that's the job of `cleanup-knowledge` drift detection)
+- [ ] Noted whether legacy `_about.md` files exist anywhere in `core_knowledge/` (do NOT migrate here — that's the job of `cleanup-knowledge`'s legacy migration)
 
 ---
 
@@ -25,10 +26,10 @@
 - [ ] Identified key directories (src/, lib/, tests/, etc.)
 - [ ] Checked for existing documentation (README, docs/)
 
-### Monorepo & Tier-2 Signal Detection
+### Monorepo & Optional-Folder Signal Detection
 - [ ] Checked for monorepo signals (workspace tools, multiple manifests, `packages/`/`apps/`/`services/`/`libs/`)
 - [ ] Recorded `monorepo_signals.detected` (true/false) with evidence
-- [ ] Checked for Tier-2 trigger signals:
+- [ ] Checked for optional-folder trigger signals:
   - [ ] REST/GraphQL/gRPC endpoints → `api/`
   - [ ] DB/ORM/schema files → `data_models/`
   - [ ] Kafka/MQ libraries → `events/`
@@ -44,64 +45,54 @@
 ### State Management
 - [ ] workflow-state.json initialized
 - [ ] `workflow_type = "repository-initialize"`
-- [ ] `findings.repository_analysis` populated (including monorepo_signals + tier2_signals)
+- [ ] `findings.repository_analysis` populated (including monorepo_signals + scan_signals)
 
 ---
 
-## Step 2: Structure Proposal
+## Step 2: Structure Proposal (single review screen)
 
-### Gate A — Tier-1 Baseline
-- [ ] Tier-1 baseline announced (2 root files + 4 root folders + private_knowledge tree)
-- [ ] User confirmed Tier-1 (no editing of baseline allowed)
-- [ ] State updated: `tier1_confirmed = true`
-
-### Gate B — Monorepo Layout (when applicable)
-- [ ] If monorepo signals detected: presented 3 layout options (a/b/c)
-- [ ] Recommendation + rationale + evidence shown
-- [ ] User explicitly chose a layout (no auto-decision)
-- [ ] State updated: `monorepo_layout` = chosen value, `monorepo_projects` populated
-
-### Gate C — Tier-2 Candidates (one-at-a-time)
-- [ ] Each applicable Tier-2 candidate presented INDIVIDUALLY
-- [ ] For each: recommendation, rationale, scan evidence shown
-- [ ] User decided each separately (Y/N/Explain)
-- [ ] `events/` candidate offered the separate-vs-nested-vs-skip choice
-- [ ] State updated: `tier2_decisions` map populated with all decisions
-
-### Gate D — Final Approval
-- [ ] Full structure tree previewed (including all approved folders + `private_knowledge/` + `.gitignore`)
-- [ ] User explicitly approved
-- [ ] State updated: `user_approved = true`, `approval_timestamp` set
+- [ ] Single review screen rendered (no multi-gate ceremony)
+- [ ] Baseline rows (mandatory) shown as fixed/checked
+- [ ] Optional folder rows pre-selected based on signal evidence; user can toggle
+- [ ] Monorepo layout selectable on the same screen (single / per-project / hybrid)
+- [ ] `events/` placement (separate vs nested under `data_models/`) shown when `events/` is selected
+- [ ] Final tree preview rendered with current selections
+- [ ] User explicitly approved with `[A]`
+- [ ] State updated: `structure_proposal.user_approved = true`, `approval_timestamp` set
+- [ ] State captures full resolved structure: `approved_folders`, `events_placement`, `monorepo_layout`, `monorepo_projects`
 
 ---
 
 ## Step 3: Structure Implementation
 
-### Tier-1 Root Files
+### Root Files
 - [ ] `knowledge/core_knowledge/index.md` created from `index-template.md`
   - [ ] Routing table populated
+  - [ ] Coverage table populated for all approved folders
+  - [ ] **Folder Contracts** section populated for every approved folder (baseline + optional)
   - [ ] Mission paragraph filled (or marked TODO)
   - [ ] No `{{variable}}` placeholders remain (except intentional TODO markers)
 - [ ] `knowledge/core_knowledge/architecture.md` created from `architecture-template.md`
 
-### Tier-1 Folders
-- [ ] `components/` exists with `_about.md` from template
-- [ ] `infrastructure/` exists with `_about.md` from template
-- [ ] `processes/` exists with `_about.md` from template
-- [ ] `team_and_stakeholders/` exists with `_about.md` + 3 placeholder files:
+### Baseline Folders
+- [ ] `components/` exists (with `.gitkeep` if empty)
+- [ ] `infrastructure/` exists (with `.gitkeep` if empty)
+- [ ] `processes/` exists (with `.gitkeep` if empty)
+- [ ] `team_and_stakeholders/` exists with 3 placeholder files:
   - [ ] `contacts.md`
   - [ ] `team-structure.md`
   - [ ] `ownership-map.md`
+- [ ] No `_about.md` files were created in any folder
 
-### Tier-2 Folders
-- [ ] Every approved Tier-2 folder exists with its generated `_about.md`
-- [ ] If `events` decision = `nested`: lives at `data_models/events/_about.md`
-- [ ] No Tier-2 folder created without explicit user approval
+### Optional Folders
+- [ ] Every approved optional folder exists with a `.gitkeep`
+- [ ] If `events_placement = "nested"`: lives at `data_models/events/.gitkeep` (no separate `events/` folder)
+- [ ] No optional folder created without explicit user approval
 
 ### Monorepo Layout (if applicable)
-- [ ] If layout = "c" (hybrid): `core_knowledge/projects/<name>/` per project, with components/, infrastructure/, processes/ sub-trees
-- [ ] If layout = "b" (per-project): full Tier-1 structure under each project
-- [ ] If layout = "a"/"single": no extra project tree
+- [ ] If layout = "hybrid": `core_knowledge/projects/<name>/` per project, with `components/`, `infrastructure/`, `processes/` sub-folders (each with `.gitkeep`)
+- [ ] If layout = "per-project": full baseline structure under each project (and the team_and_stakeholders/ placement strategy decided with the user)
+- [ ] If layout = "single": no extra project tree
 
 ### Private Knowledge Tree
 - [ ] `knowledge/private_knowledge/` exists
@@ -127,6 +118,7 @@
 
 ### Forbidden Items (must NOT exist)
 - [ ] No `knowledge/personal_knowledge/` folder created (legacy name)
+- [ ] No `_about.md` files anywhere in `core_knowledge/`
 - [ ] No folder created outside the approved proposal
 - [ ] No content committed inside `private_knowledge/` (only `.gitkeep`)
 - [ ] No reference to `private_knowledge/` from any file in `core_knowledge/`
@@ -134,7 +126,7 @@
 
 ### File Verification
 - [ ] All routing-table entries in `index.md` point to real folders/files
-- [ ] All `_about.md` files render as valid Markdown
+- [ ] All Folder Contracts entries in `index.md` correspond to a real folder on disk
 - [ ] No broken internal links
 
 ### Cleanup
@@ -152,27 +144,28 @@
 - [ ] ❌ `.gitignore` not overwritten — if it existed, must have been appended
 - [ ] ❌ `private_knowledge/` content never committed
 - [ ] ❌ No legacy `personal_knowledge/` references created
+- [ ] ❌ No `_about.md` files created (legacy pattern)
 
 ### Quality Issues (Should Fix)
 - [ ] ⚠️ Routing table is genuinely useful (each row tells an agent what's there vs not)
-- [ ] ⚠️ Each `_about.md` clearly delimits scope (what does NOT go here)
-- [ ] ⚠️ Tier-2 folder names match the approved canonical list
+- [ ] ⚠️ Folder Contracts section in `index.md` clearly delimits scope (each folder has "Holds" and "Does NOT hold")
+- [ ] ⚠️ Optional folder names match the approved canonical list
 
 ---
 
 ## Completion Criteria
 
 All of the following must be true:
-1. ✅ Repository scanned and signals (monorepo + Tier-2) detected
-2. ✅ Tier-1 baseline confirmed by user
-3. ✅ Monorepo layout explicitly chosen (if applicable)
-4. ✅ Each Tier-2 candidate decided individually
-5. ✅ User explicitly approved at Gate D
-6. ✅ All Tier-1 files and folders created with proper templates
-7. ✅ All approved Tier-2 folders exist with `_about.md`
-8. ✅ Private knowledge tree created with `.gitkeep` files
-9. ✅ `.gitignore` configured (created or appended idempotently)
-10. ✅ Hard rules announced in completion report
+1. ✅ Repository scanned and signals (monorepo + optional folders) detected
+2. ✅ Single review screen presented and approved by user
+3. ✅ All baseline files and folders created
+4. ✅ All approved optional folders exist with `.gitkeep`
+5. ✅ `index.md` Folder Contracts section is populated (and is the ONLY place contracts live)
+6. ✅ No `_about.md` files anywhere
+7. ✅ Private knowledge tree created with `.gitkeep` files
+8. ✅ `.gitignore` configured (created or appended idempotently)
+9. ✅ Hard rules announced in completion report
+10. ✅ Authoring scaffolds in `_bmad/kipi/templates/folder-templates/` mentioned in completion report
 11. ✅ workflow-state.json shows `completed`
 
 ---

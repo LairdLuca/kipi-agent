@@ -37,4 +37,4 @@ These rules apply to every file generated during initialization. See `_bmad/kipi
 1. **Names of people** appear ONLY in `core_knowledge/team_and_stakeholders/` (in `contacts.md`, `team-structure.md`, or `ownership-map.md`). All other Core-Knowledge files use roles.
 2. **No `private_knowledge/` references** — no file in `core_knowledge/` may link to, cite, embed, or path-mention `private_knowledge/`.
 3. **`private_knowledge/` content is git-ignored** — `.gitignore` is configured during step-03; only `.gitkeep` files preserve folder structure.
-4. **Self-check before writing** — every generated file (templates, `_about.md`, placeholders) is checked for the rules above before save.
+4. **Self-check before writing** — every generated file (templates, placeholders, `index.md` Folder Contracts section) is checked for the rules above before save.

@@ -2,29 +2,27 @@
 
 ## MANDATORY EXECUTION RULES (READ FIRST)
 
-- 🛑 NEVER create folders/files outside the approved structure from Step 2
-- ✅ ALWAYS use the templates from `{agent-root}/templates/` for all generated files
-- 📋 SHOW user the full creation preview before creating anything
+- 🛑 NEVER create folders/files outside the structure approved in Step 2
+- ✅ ALWAYS use the index-template.md and other templates from `{agent-root}/templates/`
+- 📋 SHOW the user the full creation preview before writing anything
 - 🔄 UPDATE workflow-state.json after each file created
 - 🧹 PURGE detailed proposal data from context after completion; keep only the summary
 - 🔒 Treat `private_knowledge/` content as never-to-commit. Only `.gitkeep` files preserve folder structure.
 - ➕ When `.gitignore` already exists at project root: APPEND idempotently with a header comment, log the action in the completion report. Never overwrite.
+- 🚫 Do NOT create per-folder `_about.md` files. Folder contracts live inside `index.md` (single source of truth).
 
 ---
 
 ## Prerequisites
 
 - Step 2 (Propose) must be completed
-- workflow-state.json must show:
-  - `structure_proposal.tier1_confirmed = true`
-  - `structure_proposal.user_approved = true`
-  - `structure_proposal.approval_timestamp` is set
+- workflow-state.json must show `structure_proposal.user_approved = true`
 
 ---
 
 ## Your Task
 
-Create the approved Core-Knowledge structure: 2 root files, 4 Tier-1 folders (each with `_about.md`), the 3 mandatory `team_and_stakeholders/` initial files, every approved Tier-2 folder (with `_about.md`), the full `private_knowledge/` tree (with `.gitkeep` files), and the `.gitignore` rules at project root.
+Create the approved Core-Knowledge structure: 2 root files (`index.md` with embedded folder contracts, `architecture.md`), the approved folders (each empty with a `.gitkeep`), the 3 mandatory `team_and_stakeholders/` files, the full `private_knowledge/` tree (with `.gitkeep` files), and the `.gitignore` rules at project root.
 
 ---
 
@@ -32,17 +30,13 @@ Create the approved Core-Knowledge structure: 2 root files, 4 Tier-1 folders (ea
 
 | Template | Used for |
 |---|---|
-| `{agent-root}/templates/index-template.md` | Root `index.md` |
+| `{agent-root}/templates/index-template.md` | Root `index.md` (includes the **Folder Contracts** section — populate from the catalog row of every approved folder) |
 | `{agent-root}/templates/architecture-template.md` | Root `architecture.md` |
-| `{agent-root}/templates/about-templates/components-about.md` | `components/_about.md` |
-| `{agent-root}/templates/about-templates/infrastructure-about.md` | `infrastructure/_about.md` |
-| `{agent-root}/templates/about-templates/processes-about.md` | `processes/_about.md` |
-| `{agent-root}/templates/about-templates/team-and-stakeholders-about.md` | `team_and_stakeholders/_about.md` |
 | `{agent-root}/templates/team-and-stakeholders/contacts-template.md` | `team_and_stakeholders/contacts.md` |
 | `{agent-root}/templates/team-and-stakeholders/team-structure-template.md` | `team_and_stakeholders/team-structure.md` |
 | `{agent-root}/templates/team-and-stakeholders/ownership-map-template.md` | `team_and_stakeholders/ownership-map.md` |
 
-For Tier-2 folders, generate `_about.md` inline using the contract pattern below.
+`{agent-root}/templates/folder-templates/` contains optional **authoring scaffolds** (component, infrastructure-topic, process, job). These are **not auto-installed**. Mention them in the completion report so users know the scaffolds exist when they want to start writing files.
 
 ---
 
@@ -56,7 +50,14 @@ Check workflow-state.json:
 
 ### 2. Build Creation Manifest
 
-Construct the full list of files & folders to create. The manifest depends on the approved structure (Tier-1 baseline, monorepo layout, approved Tier-2 folders).
+Construct the full list of files & folders to create from `findings.structure_proposal`:
+- Always: `index.md`, `architecture.md`, `components/`, `infrastructure/`, `processes/`, `team_and_stakeholders/` (with 3 files)
+- Each entry in `approved_folders` that's not in the baseline → create as empty folder with `.gitkeep`
+- `events_placement = "nested"` → put `events/` under `data_models/events/.gitkeep` instead
+- Monorepo layout:
+  - `single` → no projects subtree
+  - `per-project` → for each project, replicate the baseline tree under `core_knowledge/<project_name>/`
+  - `hybrid` → keep top-level shared, add `core_knowledge/projects/<project_name>/{components,infrastructure,processes}/.gitkeep` for each project
 
 ### 3. Show Creation Preview
 
@@ -70,27 +71,26 @@ knowledge/
 │   ├── index.md                                         (from index-template.md)
 │   ├── architecture.md                                  (from architecture-template.md)
 │   ├── components/
-│   │   └── _about.md                                    (folder contract)
+│   │   └── .gitkeep
 │   ├── infrastructure/
-│   │   └── _about.md                                    (folder contract)
+│   │   └── .gitkeep
 │   ├── processes/
-│   │   └── _about.md                                    (folder contract)
+│   │   └── .gitkeep
 │   ├── team_and_stakeholders/
-│   │   ├── _about.md                                    (folder contract)
 │   │   ├── contacts.md                                  (placeholder)
 │   │   ├── team-structure.md                            (placeholder)
 │   │   └── ownership-map.md                             (placeholder)
-{{#each approved_tier2_folders}}
+{{#each approved_optional_folders}}
 │   ├── {{name}}/
-│   │   └── _about.md                                    (folder contract — generated)
+│   │   └── .gitkeep
 {{/each}}
 {{#if monorepo_hybrid}}
 │   └── projects/
 {{#each monorepo_projects}}
 │       └── {{project_name}}/
-│           ├── components/_about.md
-│           ├── infrastructure/_about.md
-│           └── processes/_about.md
+│           ├── components/.gitkeep
+│           ├── infrastructure/.gitkeep
+│           └── processes/.gitkeep
 {{/each}}
 {{/if}}
 └── private_knowledge/
@@ -111,7 +111,7 @@ Total: {{folder_count}} folders, {{file_count}} files
 
 Wait for [P] or [C].
 
-### 4. Create core_knowledge Tier-1
+### 4. Create core_knowledge baseline
 
 ```
 1. Create `{project-root}/knowledge/core_knowledge/`
@@ -121,50 +121,52 @@ Wait for [P] or [C].
    - {{primary_language}}
    - {{date}}
    - {{project_mission_1_paragraph}}  ← if not yet known, leave a TODO marker
-   - tier2_folders_present block iterates over approved Tier-2 folders
+   - In the **Folder Contracts** section, render one block per approved folder using the catalog row from step-02 (scope + does-NOT-hold). For optional folders, populate the "Optional folders enabled in this repo" subsection.
+   - The optional_folders_present block (used by Routing Table, Coverage, and Folder Contracts) iterates over the approved optional folders.
 3. Write `architecture.md` from architecture-template.md
-4. For each Tier-1 folder (`components/`, `infrastructure/`, `processes/`, `team_and_stakeholders/`):
+4. For each baseline folder (`components/`, `infrastructure/`, `processes/`, `team_and_stakeholders/`):
    a. Create folder
-   b. Write `_about.md` from the matching template
+   b. (No `_about.md`. Contracts live in `index.md`.)
 5. Inside `team_and_stakeholders/`:
    - Write `contacts.md` from contacts-template.md
    - Write `team-structure.md` from team-structure-template.md
    - Write `ownership-map.md` from ownership-map-template.md
-6. Report each file created:
+6. Add `.gitkeep` to `components/`, `infrastructure/`, `processes/` (so the empty folders survive git).
+7. Report each file created:
    "✓ Created knowledge/core_knowledge/index.md"
    "✓ Created knowledge/core_knowledge/architecture.md"
-   "✓ Created knowledge/core_knowledge/components/_about.md"
+   "✓ Created knowledge/core_knowledge/components/.gitkeep"
    ...
 ```
 
-### 5. Create core_knowledge Tier-2 (per approval)
+### 5. Create optional folders (per approval)
 
-For each approved Tier-2 folder:
+For each approved optional folder:
 
 ```
 a. Create `{project-root}/knowledge/core_knowledge/{folder}/`
-b. Generate `_about.md` inline using the Tier-2 contract pattern (see appendix at end of this file)
-c. Write the file
-d. Report: "✓ Created knowledge/core_knowledge/{folder}/_about.md"
+b. Write `.gitkeep` inside (no `_about.md` — its contract lives in `index.md`).
+c. Report: "✓ Created knowledge/core_knowledge/{folder}/.gitkeep"
 ```
 
-If `events` decision = `nested`, create `data_models/events/` instead and put the `_about.md` there.
+If `events_placement = "nested"`, create `data_models/events/.gitkeep` instead.
 
-### 6. Create monorepo project sub-trees (if hybrid layout)
+### 6. Create monorepo project sub-trees (if hybrid or per-project layout)
 
-If `monorepo_layout = "c"` (hybrid):
+If `monorepo_layout = "hybrid"`:
 
 ```
 For each project in `monorepo_projects`:
   Create `{project-root}/knowledge/core_knowledge/projects/{project_name}/`
-  Inside it, create the project-scoped subset:
-    - components/_about.md (use components-about template; project-scoped)
-    - infrastructure/_about.md
-    - processes/_about.md
+  Inside it, create the project-scoped subset (each folder gets a `.gitkeep`):
+    - components/.gitkeep
+    - infrastructure/.gitkeep
+    - processes/.gitkeep
 ```
 
-If `monorepo_layout = "b"` (per-project): full Tier-1 structure under each project.
-If `monorepo_layout = "a"` or `"single"`: skip this step.
+If `monorepo_layout = "per-project"`: replicate the full baseline tree under each project (including `team_and_stakeholders/` only if the user wants per-project ownership; otherwise keep `team_and_stakeholders/` shared at the top level — Hard Rule #1 favours one place for names).
+
+If `monorepo_layout = "single"`: skip this step.
 
 ### 7. Create private_knowledge tree
 
@@ -177,8 +179,6 @@ If `monorepo_layout = "a"` or `"single"`: skip this step.
    - personal_tasks/.gitkeep
 3. Report: "✓ Created knowledge/private_knowledge/ tree (4 .gitkeep files)"
 ```
-
-`.gitkeep` files contain nothing (or a single comment line if needed). Their job is to keep empty folders in git.
 
 ### 8. Configure .gitignore at project root
 
@@ -228,7 +228,7 @@ After all files created:
   "current_step": "completed",
   "completed_steps": [
     {"step": "step_1_scan", "status": "completed", "timestamp": "...", "summary": "Scanned repo"},
-    {"step": "step_2_propose", "status": "completed", "timestamp": "...", "summary": "Tier-1 baseline + {{n}} Tier-2 folders + {{layout}} layout"},
+    {"step": "step_2_propose", "status": "completed", "timestamp": "...", "summary": "Approved {{n}} folders, {{layout}} layout"},
     {"step": "step_3_implement", "status": "completed", "timestamp": "...", "summary": "Structure created"}
   ],
   "timestamps": {"completed": "{{now}}"},
@@ -248,10 +248,10 @@ Show user:
 ✅ **Core-Knowledge Structure Initialized!**
 
 **Created in `knowledge/core_knowledge/`:**
-- index.md (routing table)
+- index.md (routing table + folder contracts — single source of truth)
 - architecture.md
-- components/, infrastructure/, processes/, team_and_stakeholders/
-{{#each approved_tier2_folders}}
+- components/, infrastructure/, processes/, team_and_stakeholders/ (with 3 placeholder files)
+{{#each approved_optional_folders}}
 - {{name}}/
 {{/each}}
 
@@ -267,8 +267,16 @@ Show user:
 - `private_knowledge/` is never referenced from `core_knowledge/`
 - `private_knowledge/` content is never committed
 
+**Authoring scaffolds available** (copy in when you start writing files in a folder):
+- `_bmad/kipi/templates/folder-templates/component-template.md`
+- `_bmad/kipi/templates/folder-templates/infrastructure-topic-template.md`
+- `_bmad/kipi/templates/folder-templates/process-template.md`
+- `_bmad/kipi/templates/folder-templates/job-template.md`
+
+  Convention: copy a scaffold into the relevant folder as `_template.md` to give future contributors (human or agent) a starting shape.
+
 **Next Steps:**
-1. Review the structure: open `knowledge/core_knowledge/index.md`
+1. Review the structure: open `knowledge/core_knowledge/index.md` (read the Folder Contracts section)
 2. Populate content: run `[CS] Code Scan Document`
 3. Process raw inputs: run `[UD] Process User Data`
 4. Fill knowledge gaps: run `[DI] Developer Interview`
@@ -288,7 +296,7 @@ Would you like to start the **[CS] Code Scan** workflow now? [Y/N]
 After showing completion report:
 
 1. 🧹 PURGE detailed proposal data from context
-2. Keep only summary: "Initialized {{n}} chapters, {{m}} Tier-2 folders, {{layout}} layout"
+2. Keep only summary: "Initialized {{n}} folders, {{layout}} layout"
 3. Return to Kipi menu (or start [CS] if user requests)
 
 ---
@@ -298,12 +306,14 @@ After showing completion report:
 Before completing, verify:
 
 - [ ] `index.md` and `architecture.md` exist at `core_knowledge/` root
-- [ ] All Tier-1 folders exist with `_about.md`
+- [ ] `index.md` contains the **Folder Contracts** section, populated for every approved folder
+- [ ] All baseline folders exist (components, infrastructure, processes, team_and_stakeholders) with `.gitkeep` (or content for `team_and_stakeholders/`)
 - [ ] `team_and_stakeholders/` has all 3 placeholder files
-- [ ] All approved Tier-2 folders have `_about.md`
+- [ ] All approved optional folders exist with `.gitkeep`
+- [ ] No `_about.md` files were created (contracts are inline in `index.md`)
 - [ ] `private_knowledge/` tree exists with all 4 `.gitkeep` files
 - [ ] `.gitignore` at project root contains the Kipi block
-- [ ] No `{{placeholder}}` text remains in any generated file
+- [ ] No `{{placeholder}}` text remains in any generated file (except intentional TODO markers)
 - [ ] workflow-state.json shows `current_step = "completed"`
 - [ ] No `personal_knowledge` folder name appears anywhere
 
@@ -313,11 +323,12 @@ Load checklist: `{agent-root}/checklists/repository-initialize-checklist.md`
 
 ## Success Metrics
 
-✅ All Tier-1 files and folders created with proper templates
-✅ All approved Tier-2 folders created with `_about.md`
+✅ All baseline files and folders created with proper templates
+✅ All approved optional folders created with `.gitkeep`
+✅ `index.md` Folder Contracts section is the only place contracts live
 ✅ `private_knowledge/` tree created with `.gitkeep` files
 ✅ `.gitignore` correctly configured (created or appended)
-✅ No unapproved folders created
+✅ No `_about.md` files anywhere
 ✅ workflow-state.json shows completed
 ✅ Completion report shown
 ✅ Hard rules announced to user
@@ -327,50 +338,11 @@ Load checklist: `{agent-root}/checklists/repository-initialize-checklist.md`
 ## Failure Modes
 
 ❌ Creating folders not in approved proposal
+❌ Creating `_about.md` files (legacy pattern — contracts now live in `index.md`)
 ❌ Leaving `{{variable}}` placeholders in output
 ❌ Overwriting an existing `.gitignore` instead of appending
 ❌ Committing or surfacing private_knowledge content
 ❌ Creating an old-style `personal_knowledge/` folder
-❌ Forgetting `_about.md` in any Tier-1 or approved Tier-2 folder
-
----
-
-## Appendix — Tier-2 `_about.md` generator pattern
-
-When creating a Tier-2 `_about.md` inline, use this pattern:
-
-```markdown
-# {{folder_title}} — Folder Contract
-
-{{1-paragraph scope statement}}
-
-## What goes here
-
-- {{bullet}}
-- {{bullet}}
-
-## What does NOT go here
-
-- {{bullet pointing to the right folder}}
-
-## Hard rules
-
-- Reference roles, never names. Names live ONLY in `team_and_stakeholders/`.
-- Never link to anything inside `private_knowledge/`.
-```
-
-Pre-baked content per Tier-2 folder:
-
-| Folder | Scope statement |
-|---|---|
-| `operations/` | Runbooks, monitoring, alerting, on-call procedures, incident playbooks. The "what to do when something breaks" knowledge. |
-| `integrations/` | External systems this repo talks to (3rd-party APIs, internal services, message brokers, identity providers). Each integration is one file with auth model, rate limits, failure modes. |
-| `api/` | Public APIs this repo exposes (REST/GraphQL/gRPC). Endpoint catalog, request/response shapes, versioning, auth, error contracts. |
-| `data_models/` | Schemas, ORM models, and notable queries. Entity relationships, indexes, migrations strategy, query patterns used in code. |
-| `events/` | Topics / queues this repo produces or consumes. Topic catalog, schemas, producers, consumers, retention, DLQ behavior. |
-| `security/` | Authentication, authorization, secret handling, threat model, compliance posture. |
-| `ml/` | Model training, inference, evaluation, datasets, feature engineering, model lifecycle. |
-| `cli/` | Command-line interface: subcommands, flags, exit codes, configuration, examples. |
 
 ---
 

@@ -23,7 +23,7 @@
 | `infrastructure/` | deploy, env, dev setup, CI/CD, testing, conventions | application logic | source files |
 | `processes/` | multi-step flows (build, release, onboarding, escalation) | who-owns-what | runtime config |
 | `team_and_stakeholders/` | contacts, team structure, ownership map | technical details | n/a |
-{{#each tier2_folders_present}}
+{{#each optional_folders_present}}
 | `{{path}}/` | {{has_answers_about}} | {{does_not_have}} | {{read_code_for}} |
 {{/each}}
 
@@ -46,15 +46,56 @@
 | `infrastructure/` | ⬜ Not written | — | 0 |
 | `processes/` | ⬜ Not written | — | 0 |
 | `team_and_stakeholders/` | ⬜ Not written | — | 0 |
-{{#each tier2_folders_present}}
+{{#each optional_folders_present}}
 | `{{path}}/` | ⬜ Not written | — | 0 |
 {{/each}}
 
 ---
 
-## Folder contracts
+## Folder Contracts
 
-Each folder contains an `_about.md` file describing what belongs there. Read it before adding new content.
+> Single source of truth for what belongs in each folder. Read the relevant row before creating a new file.
+
+### `architecture.md`
+**Holds:** system shape, data flow, cross-cutting patterns, key trade-offs.
+**Does NOT hold:** component-level details (use `components/`), runbooks (use `operations/` if present), line-level logic.
+
+### `components/`
+**Holds:** one file per major module / service / package, each describing responsibilities, boundaries, public interface, dependencies, component-specific decisions.
+**Naming:** `kebab-case.md` (e.g. `auth-service.md`).
+**Sub-folders:** allowed for layered architectures (`components/frontend/`) and per-project trees in monorepos.
+**Does NOT hold:** system-wide diagrams (→ `architecture.md`), owner names (→ `team_and_stakeholders/ownership-map.md`), multi-step flows (→ `processes/`), API specs (→ `api/` if present), DB schemas (→ `data_models/` if present).
+
+### `infrastructure/`
+**Holds:** environments, deployment pipelines, hosting/cloud configuration, local dev setup, tooling, CI/CD, testing strategy, coding conventions and linting.
+**Does NOT hold:** application logic (→ `components/`), system design (→ `architecture.md`), incident runbooks (→ `operations/` if present), external integrations (→ `integrations/` if present), multi-step orchestrations (→ `processes/`).
+
+### `processes/`
+**Holds:** multi-step flows that span tools, people, and/or code — build, release, onboarding, support/escalation, code review, migrations.
+**Naming:** `kebab-case.md` (e.g. `release-process.md`).
+**Does NOT hold:** single-step automations in code (→ `infrastructure/`), incident runbooks (→ `operations/` if present), process-owner names (→ `team_and_stakeholders/ownership-map.md`).
+
+### `team_and_stakeholders/`
+**Holds:** THE only place in `core_knowledge/` where people's names appear. Required files: `contacts.md`, `team-structure.md`, `ownership-map.md`.
+**Does NOT hold:** personal notes (→ `private_knowledge/`), technical decisions (→ relevant component file or `architecture.md`).
+**Hard rule:** if you need to refer to a person elsewhere, use a role and link here.
+
+{{#if optional_folders_present}}
+### Optional folders enabled in this repo
+
+{{#each optional_folders_present}}
+#### `{{path}}/`
+**Holds:** {{scope}}
+{{#if does_not_have}}**Does NOT hold:** {{does_not_have}}{{/if}}
+{{/each}}
+{{/if}}
+
+### Universal hard rules
+
+These apply to every folder in `core_knowledge/`:
+
+1. Reference roles, never names. Names live ONLY in `team_and_stakeholders/`.
+2. Never link to, cite, embed, or path-mention anything inside `private_knowledge/`.
 
 ---
 

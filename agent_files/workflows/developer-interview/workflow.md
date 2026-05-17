@@ -57,9 +57,9 @@ Before starting:
 ### Step 1: Analyze Gaps
 **File:** `./step-01-analyze-gaps.md`
 
-- Read the routing table and coverage table from `index.md`
-- Walk every Tier-1 folder + approved Tier-2 folders
-- Score each location for "knowledge gap": missing `_about.md` content, placeholder text, low file count, file marked "⬜ Not written"
+- Read the routing table, coverage table, and Folder Contracts section from `index.md`
+- Walk every baseline folder + approved optional folders
+- Score each location for "knowledge gap": placeholder text, low file count, file marked "⬜ Not written", folder absent of any content files, missing `_template.md` despite multiple similar files, narrowed/expanded contract relative to the canonical scope
 - Cross-reference against codebase signals from prior scans
 - Produce a ranked list of the top 10 gap candidates with rationale
 - ⏸️ STOP, present ranked gap list, ask user "approve / re-rank / drop some"

@@ -58,16 +58,19 @@ Before starting:
 ### Step 2: Propose Structure
 **File:** `./step-02-propose.md`
 
-- Generate tailored chapter structure
-- Present as tree diagram with rationale
-- ⏸️ STOP for user approval or changes
+- Generate the tailored proposal in a SINGLE review screen (baseline + optional folders + monorepo layout)
+- Pre-select decisions based on scan signals; user can toggle anything
+- Render the final tree preview with all current selections
+- ⏸️ STOP for user approval or edits
 
 ### Step 3: Implement Structure
 **File:** `./step-03-implement.md`
 
 - Create knowledge/core_knowledge/ folder
-- Generate index.md from template
-- Create placeholder files for each chapter
+- Generate index.md from template (includes Folder Contracts section — single source of truth)
+- Create approved folders (each with .gitkeep, no per-folder _about.md)
+- Create the 3 mandatory team_and_stakeholders/ files
+- Create private_knowledge/ tree with .gitkeep files; configure .gitignore
 - ⏸️ STOP with completion summary
 
 ---

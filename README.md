@@ -6,65 +6,51 @@ Kipi scans your codebase, builds deep documentation organized into chapters, pro
 
 ---
 
+## Workshop
+
+For guided install (Node.js → BMad → Kipi) and a custom-agent building exercise, start at **[START_HERE.md](START_HERE.md)** and use the files in `workshop/`.
+
+---
+
 ## Prerequisites
 
 - **BMad (latest version)** must be installed in the target project
-- **Cursor IDE** with skills support
+- A supported IDE (Cursor, Claude Code, etc.) — Kipi reads your choice from BMad's config
 
-If BMad is not installed, visit the BMad repository and install it first. Kipi will refuse to activate without it.
+If BMad is not installed, install it first. Kipi will refuse to activate without it.
 
 ---
 
 ## Installation
 
-### Step 1: Copy Agent Files
+### Step 1: Copy agent files (brain)
 
-Copy the `agent_files/` folder contents into your project's `_bmad/kipi/` directory:
-
-```bash
-cp -r agent_files/ <your-project>/_bmad/kipi/
-```
-
-This includes:
-- `SKILL.md` — Main Kipi agent definition
-- `bmad-skill-manifest.yaml` — Module manifest
-- `kipi-*/` — Sub-skill definitions (6 sub-skills)
-- `workflows/` — Workflow step files
-- `checklists/` — Validation checklists
-- `templates/` — Output templates
-- `schemas/` — State tracking schema
-- `data/` — Classification rules and batching config
-
-### Step 2: Copy Cursor Skills
-
-Copy each folder from `cursor-skills/` into your project's `.cursor/skills/`:
+Copy everything under `agent_files/` into your project's `_bmad/kipi/`:
 
 ```bash
-cp -r cursor-skills/kipi/ <your-project>/.cursor/skills/kipi/
-cp -r cursor-skills/kipi-cleanup-knowledge/ <your-project>/.cursor/skills/kipi-cleanup-knowledge/
-cp -r cursor-skills/kipi-code-scan-document/ <your-project>/.cursor/skills/kipi-code-scan-document/
-cp -r cursor-skills/kipi-developer-interview/ <your-project>/.cursor/skills/kipi-developer-interview/
-cp -r cursor-skills/kipi-knowledge-status/ <your-project>/.cursor/skills/kipi-knowledge-status/
-cp -r cursor-skills/kipi-process-user-data/ <your-project>/.cursor/skills/kipi-process-user-data/
-cp -r cursor-skills/kipi-repository-initialize/ <your-project>/.cursor/skills/kipi-repository-initialize/
-cp -r cursor-skills/kipi-update-core/ <your-project>/.cursor/skills/kipi-update-core/
+mkdir -p <your-project>/_bmad/kipi
+cp -R agent_files/. <your-project>/_bmad/kipi/
 ```
 
-### Step 3: Add Cursor Rules
+This includes the main `SKILL.md`, sub-skills (`kipi-*`), workflows, templates, `ide_adapters/` (per-IDE install bundles), and `rules-template.md`.
 
-Merge the contents of `cursorrules-template` into your project's `.cursorrules` file. This adds:
-- Knowledge Verification Protocol
-- Base Knowledge Protocol (tells agents to check knowledge before responding)
-- Kipi Handshake Protocol (tells agents to suggest `/kipi-update-core` after changes)
-- Folder Awareness
+### Step 2: Activate Kipi (IDE stubs + rules)
 
-> **Note:** This is a manual merge — review the template and add what's relevant to your existing `.cursorrules`.
+In your IDE, run `/kipi` (or open Kipi from the skill menu).
 
-### Step 4: Register with BMad
+On first activation, **kipi-install** runs automatically: it copies thin skill stubs from `ide_adapters/<your-ide>/` into the right place (e.g. `.cursor/skills/` for Cursor) and merges the rules block from `rules-template.md` into your project's rules file.
+
+To re-run or add another IDE later, use **[IN] Install** from Kipi's menu.
+
+### Step 3: Register with BMad (if needed)
 
 Tell `bmad-help`: "I installed the Kipi module, help me register it."
 
-Or manually: ensure `_bmad/config.yaml` includes Kipi in the agents/modules section and that `{user_name}` is set (Kipi uses it for greetings).
+Or ensure `_bmad/config.yaml` lists Kipi and `{user_name}` is set.
+
+### Legacy manual install (Cursor only)
+
+If auto-install is unavailable, you can still copy `cursor-skills/` to `.cursor/skills/` and merge `cursorrules-template` into `.cursorrules` by hand. Prefer Step 2 when possible.
 
 ---
 
@@ -158,31 +144,18 @@ After code changes, run `/kipi-update-core` or other agents will remind you via 
 ## File Structure (This Repo)
 
 ```
-kipi/                          # repo root
-├── agent_files/               # → copy to _bmad/kipi/
+kipi-agent/
+├── agent_files/               # → copy to _bmad/kipi/ (canonical brain)
 │   ├── SKILL.md
-│   ├── bmad-skill-manifest.yaml
-│   ├── kipi-cleanup-knowledge/
-│   ├── kipi-code-scan-document/
-│   ├── kipi-developer-interview/
-│   ├── kipi-knowledge-status/
-│   ├── kipi-process-user-data/
-│   ├── kipi-repository-initialize/
-│   ├── checklists/
-│   ├── data/
-│   ├── schemas/
-│   ├── templates/
-│   └── workflows/
-├── cursor-skills/             # → copy to .cursor/skills/
-│   ├── kipi/
-│   ├── kipi-cleanup-knowledge/
-│   ├── kipi-code-scan-document/
-│   ├── kipi-developer-interview/
-│   ├── kipi-knowledge-status/
-│   ├── kipi-process-user-data/
-│   ├── kipi-repository-initialize/
-│   └── kipi-update-core/
-├── cursorrules-template       # → merge into .cursorrules
+│   ├── ide_adapters/          # per-IDE stubs + rules (used by kipi-install)
+│   ├── kipi-install/
+│   ├── kipi-*/
+│   ├── workflows/
+│   └── ...
+├── cursor-skills/             # reference stubs (same as ide_adapters/cursor/skills/)
+├── workshop/                  # participant prompts (install + agent builder)
+├── cursorrules-template       # legacy; prefer rules-template.md via kipi-install
+├── START_HERE.md
 ├── LICENSE
 └── README.md
 ```

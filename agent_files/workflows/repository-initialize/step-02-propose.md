@@ -2,325 +2,206 @@
 
 ## MANDATORY EXECUTION RULES (READ FIRST)
 
-- 🛑 NEVER implement structure without explicit user approval at every gate
-- ✅ ALWAYS announce the Tier-1 baseline first; it is mandatory and non-negotiable
-- 📋 For each Tier-2 candidate: present ONE-AT-A-TIME with recommendation + rationale + scan evidence; get individual yes/no
-- 🌳 If monorepo signals are present: ALWAYS ask the user to pick a layout (a/b/c) — even if signals are strong, never auto-decide
-- 🔄 UPDATE workflow-state.json after each gate
-- ⚡ If user requests changes, incorporate and re-present that section only
+- 🛑 NEVER implement structure without explicit user approval at this step
+- 📋 Present the FULL proposal in ONE review screen — baseline + optional folders + monorepo layout in a single editable form
+- 🎯 Pre‑select decisions based on scan signals; let the user toggle anything
+- 🔄 UPDATE workflow-state.json after the user approves
+- ⚡ If user requests edits, incorporate and re-render the same review screen
 
 ---
 
 ## Prerequisites
 
 - Step 1 (Scan) must be completed
-- workflow-state.json must have findings.repository_analysis populated, including:
-  - `monorepo_signals` (boolean + evidence list)
-  - `tier2_signals` (per-folder trigger evidence)
+- workflow-state.json must have `findings.repository_analysis` populated
 - User must have acknowledged scan results
 
 ---
 
 ## Your Task
 
-Based on the repository scan, propose the Core-Knowledge structure using the **fixed Tier-1 baseline** plus a curated set of **Tier-2 candidates** based on detected signals. Use a strictly gated, one-by-one approval flow.
+Present a single review screen that shows the **complete proposed Core-Knowledge structure** for this repo. The user can toggle optional folders, change the monorepo layout, edit folder names, then approve. No multi-gate ceremony — one screen, one approval.
 
 ---
 
-## Tier-1 Baseline (always created)
+## The folder catalog
 
-These are not negotiable. Announce them and confirm.
+Internally, every folder Kipi can create has a row in this catalog. Apply the rules to this scan to produce the pre-selected proposal.
 
-**Root files:**
-1. `index.md` — routing table + project mission + inline glossary
-2. `architecture.md` — system design
+| Folder | Stance | Trigger | Pre-select | Default scope |
+|---|---|---|---|---|
+| `architecture.md` (root file) | mandatory | always | ✅ | system shape, data flow, cross-cutting patterns |
+| `components/` | mandatory | always | ✅ | one file per major module / service / package |
+| `infrastructure/` | mandatory | always | ✅ | environments, deploy, CI/CD, dev setup, conventions |
+| `processes/` | mandatory | always | ✅ | multi-step flows (build, release, onboarding, escalation) |
+| `team_and_stakeholders/` | mandatory | always | ✅ | the only place names live (contacts, team-structure, ownership-map) |
+| `operations/` | optional | always offered | ⬜ | runbooks, monitoring, alerting, on-call, incident playbooks |
+| `integrations/` | optional | external SDK / HTTP client imports | signal-based | external systems this repo talks to (auth, rate limits, failure modes) |
+| `api/` | recommended | REST / GraphQL / gRPC endpoints | signal-based | endpoint catalog, request/response, versioning, auth, error contracts |
+| `data_models/` | recommended | DB / ORM / schemas detected | signal-based | schemas, ORM models, notable queries, indexes, migration strategy |
+| `events/` | recommended | Kafka / RabbitMQ / SQS / EventBridge / NATS | signal-based | topic catalog, schemas, producers, consumers, retention, DLQ |
+| `security/` | recommended | auth code / secrets handling / compliance markers | signal-based | authn, authz, secret handling, threat model, compliance posture |
+| `ml/` | recommended | ML training / inference code | signal-based | training, inference, evaluation, datasets, features, lifecycle |
+| `cli/` | recommended | CLI entry points | signal-based | subcommands, flags, exit codes, configuration, examples |
 
-**Root folders:**
-3. `components/` — modules / services / packages
-4. `infrastructure/` — how it runs + how to develop on it
-5. `processes/` — multi-step flows that span tools/people/code
-6. `team_and_stakeholders/` — contacts, team structure, ownership map (the only place names live)
-
-Plus the mandatory `private_knowledge/` tree under `knowledge/`:
-- `private_knowledge/raw_data/emails_team_chats/`
-- `private_knowledge/raw_data/screenshots/`
-- `private_knowledge/raw_data/meetings_transcripts/`
-- `private_knowledge/personal_tasks/`
-
-`.gitkeep` files preserve empty folders. Content of `private_knowledge/` is git-ignored.
-
----
-
-## Tier-2 Candidates (proposed one-at-a-time)
-
-| Folder | Default stance | Trigger signal |
-|---|---|---|
-| `operations/` | Always offered | Always (user picks yes/no) |
-| `integrations/` | Always offered | External SDK/HTTP client imports detected |
-| `api/` | Auto-recommend YES | REST / GraphQL / gRPC endpoints detected |
-| `data_models/` | Auto-recommend YES | Database / ORM / schemas detected (catalog includes queries + schemas) |
-| `events/` | Auto-recommend YES | Kafka / RabbitMQ / SQS / EventBridge / NATS detected — ASK user if they want it separate or merged into `data_models/` |
-| `security/` | Auto-recommend YES | Auth code / secrets handling / compliance markers detected |
-| `ml/` | Auto-recommend YES | ML training / inference code detected |
-| `cli/` | Auto-recommend YES | CLI entry points detected |
+Mandatory rows are always created. Optional rows are pre-selected based on scan signals; user can toggle.
 
 ---
 
 ## Execution Sequence
 
-### 1. Load Scan Findings
+### 1. Compute pre-selections
 
-From workflow-state.json, retrieve:
-- `repository_type`
-- `primary_language`
-- `framework`
-- `complexity`
-- `monorepo_signals` (boolean, evidence list)
-- `tier2_signals` (which Tier-2 trigger conditions matched, with evidence)
+From `findings.repository_analysis` produced in Step 1, run signal detection (load detectors inline if Step 1 didn't):
 
-### 2. Gate A — Confirm Tier-1 Baseline
+- **Monorepo signals** — workspace files (`pnpm-workspace.yaml`, `lerna.json`, `nx.json`, `rush.json`, `turbo.json`), multiple top-level `package.json` / `pyproject.toml`, `packages/` / `apps/` / `services/` / `libs/` directories.
+- **API signals** — Express/Fastify/Koa/Hono routes, FastAPI/Flask/Django routes, gRPC `.proto` files, GraphQL schemas, OpenAPI specs.
+- **Data model signals** — ORM imports (Prisma, TypeORM, SQLAlchemy, Sequelize, Diesel, GORM), `schema.sql`, `migrations/`, `models/` with class-based ORM patterns.
+- **Event signals** — Kafka / RabbitMQ / SQS / EventBridge / NATS / Redis Streams imports.
+- **Security signals** — `auth/` folders, JWT / OAuth / Passport imports, secrets-vault clients, compliance markers (SOC2, HIPAA, PCI in docs).
+- **ML signals** — torch / tensorflow / sklearn imports, `notebooks/`, `models/` artefacts.
+- **CLI signals** — `bin/`, click / typer / commander / cobra imports, executable entry points.
+- **Integration signals** — third-party SDK clients (stripe, twilio, sendgrid, slack-sdk, etc.).
 
-Present:
+For each signal, capture the evidence list (file paths + 1‑line reason).
 
-```
-📁 **Tier-1 Baseline (always created)**
+Store under `findings.scan_signals.<key>`.
 
-The following will be created in `knowledge/core_knowledge/`:
-- `index.md`            (routing table + mission + glossary)
-- `architecture.md`     (system design)
-- `components/`         (modules / services / packages)
-- `infrastructure/`     (deploy, dev setup, CI/CD, testing)
-- `processes/`          (multi-step flows: build, release, onboarding, etc.)
-- `team_and_stakeholders/` (contacts, team structure, ownership map)
+### 2. Compute proposed monorepo layout
 
-And the private tree (git-ignored) in `knowledge/private_knowledge/`:
-- `raw_data/emails_team_chats/`
-- `raw_data/screenshots/`
-- `raw_data/meetings_transcripts/`
-- `personal_tasks/`
+If monorepo signals fired, default the layout to **hybrid** (recommended). Otherwise `single`.
 
-[C] Confirm and continue
-[Q] I have a question first
-```
-
-Wait for confirmation. If [Q], answer the question and re-prompt.
-
-### 3. Gate B — Monorepo Layout (if applicable)
-
-If `monorepo_signals.detected = true`:
-
-Present:
+### 3. Render the review screen
 
 ```
-🌳 **Monorepo detected**
+📋 **Proposed Core-Knowledge structure**
 
-Evidence: {{evidence_list}}
-Detected projects: {{project_list}}
+Project: {{project_name}} ({{repository_type}}, {{primary_language}})
 
-Choose how to organize Core-Knowledge across these projects:
+---
 
-[A] Single core_knowledge — all projects documented under one
-    `components/<project>/` tree.
-    Best for: tightly-coupled monorepos.
+**Baseline (always created)**
+  ☑ knowledge/core_knowledge/index.md             — routing table + folder contracts (single source of truth)
+  ☑ knowledge/core_knowledge/architecture.md
+  ☑ knowledge/core_knowledge/components/
+  ☑ knowledge/core_knowledge/infrastructure/
+  ☑ knowledge/core_knowledge/processes/
+  ☑ knowledge/core_knowledge/team_and_stakeholders/
+        ├── contacts.md
+        ├── team-structure.md
+        └── ownership-map.md
+  ☑ knowledge/private_knowledge/                  — git-ignored
+        ├── raw_data/{emails_team_chats,screenshots,meetings_transcripts}/.gitkeep
+        └── personal_tasks/.gitkeep
+  ☑ .gitignore (created or appended)              — Kipi block
 
-[B] Per-project core_knowledge — each project gets its own full
-    Tier-1 structure under `core_knowledge/<project>/`.
-    Best for: independent products living in one repo.
+**Optional folders**  (toggle any line; pre-selected based on what we detected)
 
-[C] Hybrid (RECOMMENDED) — shared top-level for cross-cutting concerns
-    (architecture, infrastructure, team_and_stakeholders, processes)
-    + per-project sub-trees under `core_knowledge/projects/<name>/`.
-    Best for: most monorepos. Keeps team_and_stakeholders truly singular
-    (which Hard Rule #1 requires) while giving each project its own space.
+  [{{☑|⬜}}] operations/      — always offered
+  [{{☑|⬜}}] integrations/    — {{evidence_or_"always offered"}}
+  [{{☑|⬜}}] api/             — {{evidence_or_"no signal"}}
+  [{{☑|⬜}}] data_models/     — {{evidence_or_"no signal"}}
+  [{{☑|⬜}}] events/          — {{evidence_or_"no signal"}}
+  [{{☑|⬜}}] security/        — {{evidence_or_"no signal"}}
+  [{{☑|⬜}}] ml/              — {{evidence_or_"no signal"}}
+  [{{☑|⬜}}] cli/             — {{evidence_or_"no signal"}}
 
-Which layout do you want? [A/B/C]
+  events/ placement: [{{S|N}}]  S = separate folder    N = nested under data_models/events/
+
+**Monorepo layout**  ({{detected|not detected}})
+
+  ( ) single        — one core_knowledge tree for the whole repo
+  ( ) per-project   — each project gets a full core_knowledge subtree
+  (●) hybrid        — shared top-level + per-project subtrees under core_knowledge/projects/<name>/  (recommended)
+
+  Detected projects: {{project_list_or_"n/a"}}
+
+---
+
+**Final tree preview**
+
+{{tree_diagram_with_current_selections}}
+
+Total: {{folder_count}} folders, {{file_count}} files
+
+---
+
+**Reply with:**
+  [A] Approve — proceed to implementation
+  [T] Toggle — e.g. "toggle api off, integrations on, layout single"
+  [E] Explain — e.g. "explain events" — show full scope + signals for that folder
+  [R] Restart — re-run from scratch
 ```
 
-Wait for choice. Save under `findings.structure_proposal.monorepo_layout`.
+⏸️ **STOP and WAIT for user input.**
 
-If `monorepo_signals.detected = false`: skip this gate, set `monorepo_layout = "single"`.
+### 4. Handle response
 
-### 4. Gate C — Tier-2 Candidates (ONE AT A TIME)
-
-For each Tier-2 candidate that matches the rules below, present individually.
-
-**Always offer** (regardless of signals):
-- `operations/`
-- `integrations/`
-
-**Offer when signal matched** (use `tier2_signals` from scan):
-- `api/` if REST/GraphQL/gRPC detected
-- `data_models/` if DB/ORM detected
-- `events/` if Kafka/MQ detected
-- `security/` if auth/secrets detected
-- `ml/` if ML detected
-- `cli/` if CLI detected
-
-For each candidate, present:
-
-```
-🧩 **Tier-2 candidate: `{{folder_name}}/`**
-
-Recommendation: {{YES | NO}}
-Rationale: {{1-2 sentences}}
-Scan evidence: {{evidence_list_or_"always-offered"}}
-
-What does this folder hold?
-{{1-paragraph scope}}
-
-[Y] Create it
-[N] Skip
-[E] Explain more
-```
-
-Special handling for `events/`:
-
-```
-Should `events/` be its own folder, or nested inside `data_models/`?
-
-[S] Separate `events/` folder (default; preserves contract framing)
-[N] Nest under `data_models/events/` (less folders)
-[K] Skip events entirely
-```
-
-Loop through all matched candidates. After each user choice, save to `findings.structure_proposal.tier2_decisions[<folder>]`.
-
-### 5. Gate D — Final Preview
-
-After all candidates are decided, render the full final structure:
-
-```
-📋 **Final Proposed Structure**
-
-knowledge/
-├── core_knowledge/
-│   ├── index.md
-│   ├── architecture.md
-│   ├── components/
-│   │   └── _about.md
-│   ├── infrastructure/
-│   │   └── _about.md
-│   ├── processes/
-│   │   └── _about.md
-│   ├── team_and_stakeholders/
-│   │   ├── _about.md
-│   │   ├── contacts.md
-│   │   ├── team-structure.md
-│   │   └── ownership-map.md
-{{#each approved_tier2_folders}}
-│   ├── {{name}}/
-│   │   └── _about.md
-{{/each}}
-{{#if monorepo_hybrid}}
-│   └── projects/
-{{#each monorepo_projects}}
-│       └── {{project_name}}/
-│           ├── components/
-│           ├── infrastructure/
-│           └── processes/
-{{/each}}
-{{/if}}
-└── private_knowledge/                     (git-ignored)
-    ├── raw_data/
-    │   ├── emails_team_chats/.gitkeep
-    │   ├── screenshots/.gitkeep
-    │   └── meetings_transcripts/.gitkeep
-    └── personal_tasks/.gitkeep
-
-Plus `.gitignore` at project root (created or appended) to keep
-private_knowledge/ content out of git.
-
-Total folders: {{folder_count}}
-Total files (incl. _about.md, placeholders, .gitkeep): {{file_count}}
-
-[A] Approve and proceed to implementation
-[E] Edit a specific section (which?)
-[R] Reject and start over
-```
+- **[A]** → save the resolved structure to state, mark step complete, advance to `step-03-implement.md`.
+- **[T]** → parse the toggle string, update pre-selections, re-render the review screen.
+- **[E]** → show the catalog row for the requested folder (full default scope + signal evidence), then re-render the review screen.
+- **[R]** → wipe pre-selections, re-run from Step 1.
 
 ---
 
 ## State Update
 
-After each gate, update workflow-state.json:
+After approval, write to workflow-state.json:
 
 ```json
 {
   "current_step": "step_2_propose",
   "findings": {
+    "scan_signals": {
+      "monorepo": {"detected": true|false, "evidence": ["..."], "projects": ["..."]},
+      "api": {"detected": true|false, "evidence": ["..."]},
+      "data_models": {"detected": true|false, "evidence": ["..."]},
+      "events": {"detected": true|false, "evidence": ["..."]},
+      "security": {"detected": true|false, "evidence": ["..."]},
+      "ml": {"detected": true|false, "evidence": ["..."]},
+      "cli": {"detected": true|false, "evidence": ["..."]},
+      "integrations": {"detected": true|false, "evidence": ["..."]}
+    },
     "structure_proposal": {
-      "tier1_confirmed": true,
-      "monorepo_layout": "single | a | b | c",
+      "approved_folders": ["components", "infrastructure", "processes", "team_and_stakeholders", "operations", "api"],
+      "events_placement": "separate | nested | not-applicable",
+      "monorepo_layout": "single | per-project | hybrid",
       "monorepo_projects": ["..."],
-      "tier2_decisions": {
-        "operations": "yes | no",
-        "integrations": "yes | no",
-        "api": "yes | no | not-offered",
-        "data_models": "yes | no | not-offered",
-        "events": "separate | nested | skipped | not-offered",
-        "security": "yes | no | not-offered",
-        "ml": "yes | no | not-offered",
-        "cli": "yes | no | not-offered"
-      },
-      "approved_tier2_folders": ["operations", "api", ...],
-      "user_approved": false,
-      "approval_timestamp": null
+      "user_approved": true,
+      "approval_timestamp": "{{now}}"
     }
   },
-  "resume_instructions": "Awaiting final approval at gate D."
+  "resume_instructions": "Proposal approved; ready to implement."
 }
 ```
 
 ---
 
-## Handle User Response at Gate D
-
-### If [A] Approve:
-1. Update workflow-state.json:
-   - `structure_proposal.user_approved = true`
-   - `structure_proposal.approval_timestamp = now`
-2. Mark step_2 as completed
-3. Proceed to `./step-03-implement.md`
-
-### If [E] Edit:
-1. Ask: "Which gate? [A=Tier-1 baseline, B=monorepo layout, C=a specific Tier-2 folder]"
-2. Re-execute that gate only
-3. Re-render Gate D preview
-4. Loop until approved
-
-### If [R] Reject:
-1. Ask: "What approach would work better?"
-2. Reset relevant findings
-3. Restart from Gate A
-
----
-
 ## Success Metrics
 
-✅ Tier-1 baseline confirmed without negotiation
-✅ Monorepo layout explicitly chosen by user (when applicable)
-✅ Each Tier-2 candidate decided individually with rationale shown
-✅ User saw full structure preview before final approval
-✅ workflow-state.json captures all decisions
+✅ Single review screen rendered with all decisions visible at once
+✅ Each optional folder shows its pre-selection rationale (signal evidence or "always offered")
+✅ Monorepo layout selectable on the same screen
+✅ User approved with a single action ([A])
+✅ State captures the full resolved structure
 
 ---
 
 ## Failure Modes
 
-❌ Skipping the Tier-1 confirmation gate
-❌ Auto-deciding monorepo layout without asking
-❌ Bundling Tier-2 candidates into a single approval
-❌ Implementing without final approval at Gate D
-❌ Not capturing per-Tier-2 decisions in state
+❌ Rendering separate gates instead of a single review screen
+❌ Forcing the user to confirm baseline mandatory items separately
+❌ Auto-deciding monorepo layout without showing options
+❌ Implementing before approval is recorded in state
 
 ---
 
 ## Next Step
 
-After user approves at Gate D:
+After [A] Approve:
 
-1. Update workflow-state.json with approval
-2. Add step_2_propose to completed_steps
-3. Load and execute `./step-03-implement.md`
+1. Update workflow-state.json with `user_approved = true` and `approval_timestamp`.
+2. Add `step_2_propose` to `completed_steps`.
+3. Load and execute `./step-03-implement.md`.
 
-**DO NOT proceed until user explicitly approves at Gate D!**
+**Do not proceed without explicit approval.**

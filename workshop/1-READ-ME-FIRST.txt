@@ -1,0 +1,14 @@
+WELCOME TO THE WORKSHOP — read this first (15 seconds).
+
+You don't need to install anything in advance. The AI does it for you.
+
+DURING the workshop:
+  1. Open 2-INSTALL-PROMPT.txt from this repo (workshop/ folder).
+  2. Copy ALL of it.
+  3. Open your project in Cursor or VSCode + Claude Code.
+  4. Open a new AI chat in your IDE.
+  5. Paste the prompt and press Enter.
+
+The AI chat will install everything (Node.js, BMad, Kipi) and walk you through it step by step.
+
+That's it.

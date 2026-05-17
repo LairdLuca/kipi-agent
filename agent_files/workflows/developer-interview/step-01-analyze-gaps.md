@@ -24,17 +24,19 @@ Walk the entire `core_knowledge/` tree, score every location for "knowledge gap,
 
 ## Execution Sequence
 
-### 1. Read the routing & coverage tables
+### 1. Read the routing, coverage and contracts sections
 
 From `knowledge/core_knowledge/index.md`:
 - The Routing Table — gives the canonical list of locations
 - The Coverage table — gives current status (`⬜ Not written` is a strong gap signal)
+- The Folder Contracts section — gives the scope each folder is supposed to hold
 
 ### 2. Walk the structure
 
 For each folder/file in `core_knowledge/`:
-- Check `_about.md` — is it just the contract or has scope been narrowed/expanded?
+- Cross-reference the folder's entry in the **Folder Contracts** section of `index.md` — has the scope been narrowed/expanded for this project?
 - Check files inside — are they placeholder-only, partial, or substantive?
+- Note whether the folder has a `_template.md` authoring scaffold (or could benefit from one if it has 3+ similarly-shaped files)
 - Cross-reference codebase signals from prior `[CS]` scans (in workflow-state.json from past runs)
 
 ### 3. Score each location
@@ -45,12 +47,14 @@ Apply this rubric (higher score = bigger gap):
 |---|---|
 | File marked `⬜ Not written` in coverage table | +0.40 |
 | File contains only placeholder text (`{{...}}` or "to be written") | +0.30 |
-| Folder has `_about.md` but no actual content files | +0.25 |
+| Folder is empty (only `.gitkeep`) but its contract is enabled in `index.md` | +0.25 |
 | File last updated > 90 days ago and code in scope has changed | +0.20 |
 | Strong codebase signal but missing knowledge file (e.g. Kafka detected, no `events/`) | +0.30 |
 | `team_and_stakeholders/` files are empty/placeholder | +0.25 (always relevant for ownership clarity) |
 | `architecture.md` is empty/placeholder | +0.35 |
 | Multi-step process exists in CI/scripts but not documented in `processes/` | +0.30 |
+| Folder has 3+ files with similar shape but no `_template.md` scaffold | +0.10 |
+| Legacy `_about.md` still on disk (should be migrated by `[CL] Cleanup`) | +0.10 (advisory) |
 
 Add weights for each location. Cap at 1.0.
 
@@ -92,7 +96,7 @@ Walked `core_knowledge/`. Top 10 gaps to close, ranked by impact:
 |---|---|---|---|---|
 | 1 | architecture.md | placeholder | 0.95 | System shape & key patterns are unwritten |
 | 2 | processes/release-process.md | missing_content | 0.85 | Multi-step CI flow exists in code but not documented |
-| 3 | components/auth-service.md | placeholder | 0.80 | _about.md present but no content |
+| 3 | components/auth-service.md | placeholder | 0.80 | folder enabled in index.md contracts but no content |
 | 4 | team_and_stakeholders/ownership-map.md | identity | 0.75 | Empty — no asset owners recorded |
 | ... |
 
