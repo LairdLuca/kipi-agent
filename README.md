@@ -1,3 +1,11 @@
+## About this branch (`onegate`)
+
+This branch adds one folder, [`standalone/`](standalone/README.md): Kipi as two Claude Code skills (`kipi` and `kipi-update`) with a vault skeleton and no BMad requirement. It is used by [onegate](https://github.com/LairdLuca/onegate), a working configuration for Claude Code that installs it into a project after a short interview. Upstream's files are untouched on this branch except this section and one added line in `LICENSE`; the `main` branch of this fork is identical to upstream.
+
+Credit: Kipi, its name, its capability menu and the shape of the keeper come from [`ladymeyy/kipi-agent`](https://github.com/ladymeyy/kipi-agent) (MIT). The upstream author is credited here with thanks, and every file under `standalone/` that derives from upstream says so in its header.
+
+---
+
 # Kipi — Core-Knowledge Keeper
 
 A BMad module that manages repository documentation, systematic knowledge organization, and intelligent file processing.

@@ -1,0 +1,25 @@
+# Origin: adapted from kipi-agent (ladymeyy) data/knowledge-classification.csv, modified: standalone, no BMad, and a source-status column that applies section 1.1 of _meta/conventions.md (the channel decides the status of the information).
+# Target chapters are described by role (the chapter of the concept touched), never by a fixed section number: each vault names its own sections in index.md.
+# Used by [PD] Process Raw Notes as a first attempt at classification. Low confidence or an unrecognised pattern means ask, never guess. Cells hold no commas; ; separates the items of a list.
+type_id,name,file_name_pattern,target_chapter,source_status,what_to_extract,priority,auto_classify
+task_text,Text of a work item,task-*,chapter of the variant or area the item touches,requirement (may contain ambiguity),Requirement;acceptance criteria;variant and branch;item number,high,yes
+dev_report,Development report of an agent,dev-report-*,chapter of the concept touched,to re-verify in source before the fold-in,Files and lines touched;decisions taken;declared risks;commit,high,yes
+handoff,Handoff between agents,handoff-*,chapter of the concept touched,to re-verify in source before the fold-in,What to carry and where;dated facts with commit;open points,high,yes
+test_round_report,Report of a test round,round-*;test-round-*;report-cases-*,chapter of the concept touched + the variant chapter,verified fact on screen (state the test record and the environment),Cases passed and failed;records and environment used;defects out of scope,high,yes
+analysis,Preliminary analysis,analysis-*,chapter of the concept touched,hypothesis until re-verified,Hypotheses;evidence read;open questions,medium,yes
+call_transcript,Notes or transcript of a call,call *;*transcript*;*meeting*,communication log of the relevant chapter,indication to validate,Decisions announced;who said what;date and time;actions,high,yes
+email,Email thread,*email*;*mail*,communication log of the relevant chapter,written indication to validate,Indications;constraints declared;sender and date,medium,yes
+communication_log,Log of communication with the team,communication-log-*,communication log of the relevant chapter,indication to validate,Text sent;recipient;date and time;state of the reply,medium,yes
+team_questions,Questions sent to the team,team-questions-*,open points of the chapter + the state file of the variant,open question (not knowledge until someone answers),Question;recipient;date;state,medium,yes
+reviewer_reply,Reply of a reviewer or a project manager,*reply*;*response*,relevant chapter + communication log,decision taken (if explicit) otherwise indication,Decision;rationale;what stays open,high,yes
+team_roster,Who is who (a role or a team change),no file name pattern: recognised from the content,_meta/roles-and-sources.md,direct statement of the human (informal channel but direct source),Role label;role;internal or external;areas of competence;date of the statement,high,yes
+interview,Answers to a developer interview,developer-interview-*,chapters named by the [DI] workflow,indication to validate,Answer per question;channel;author role;date,high,yes
+lessons,Technical lessons collected,lessons-*,several chapters (one lesson per chapter),depends on the lesson,Lesson;target chapter;whether it is already documented,medium,yes
+reminder,Reminder or doubt to measure,reminder-*,open-items list (todo.jsonl),open doubt,What to verify;where;why it is open,medium,yes
+keeper_brief,Process brief for Kipi,kipi-brief-*,none (input of a workflow),not knowledge,Instructions for the workflow,low,yes
+publication_draft,Draft of a pull request or work item comment,draft-*,none (stays in the reports folder),not knowledge,Text published or to publish;what was cut,low,yes
+screenshot,Screenshot or image,*.png;*.jpg;*.jpeg;*.gif,none (referenced from the chapter),evidence on screen,What it shows;which screen;test record and environment,low,no
+env_error,Build or environment error,*build*;*error*;*setup*,_meta/env-troubleshooting-log.md,verified fact if reproduced,Message;project;cause;workaround,medium,yes
+code_review,Code review or pull request comments,*review*;*pr-*;*pull-request*,chapter of the concept touched + communication log,indication of the reviewer to validate,Findings;decisions;what was accepted,high,yes
+decision_record,Architectural decision,*adr*;*decision*,relevant chapter + the project's decision records,decision taken,Context;decision;consequences;alternatives rejected,high,yes
+unknown,Not classified,N/A,ask,unknown,Summary;keywords detected;candidate chapter,low,no
