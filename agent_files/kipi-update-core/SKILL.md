@@ -13,8 +13,10 @@ This skill runs the `[UK]` workflow of Kipi without loading the persona, the men
 
 ## Before starting
 
+These checks are tool calls, not a reading: before step 1 of the workflow, look at each path named below with a `Glob`, an `ls` or a `Read`, and do it whether or not this run will later need the file (an empty vault, nothing to apply, does not excuse it). Having read this skill is not the check, and a path you did not look at is a path you do not know exists.
+
 - `{{VAULT_DIR}}/index.md` must exist. If it is missing, stop and say so: the vault is not in a state to work on.
-- If a file this skill needs is missing (`{{KIPI_HOME}}/workflows/capture.md`, `{{VAULT_DIR}}/_meta/conventions.md`, or a stub or command), stop, say which path is missing and that `[UK]` needed it, and propose the repair of the rule "Missing files" of `{{KIPI_HOME}}/SKILL.md`. Write nothing for the repair until the person says yes; never reconstruct the missing text.
+- Every file this skill needs must exist: `{{KIPI_HOME}}/workflows/capture.md`, `{{VAULT_DIR}}/_meta/conventions.md`, and a stub or command. If one is missing, stop before step 1, say which path is missing and that `[UK]` needed it, and apply the rule "Missing files" of `{{KIPI_HOME}}/SKILL.md`: propose the repair. Write nothing for the repair until the person says yes; never reconstruct the missing text.
 - **Other keepers at work?** There is no waiting and no lock: the protocol "Keepers in parallel" below applies.
 - Write only inside Kipi's closed list of paths (Kipi's rules block in the workspace rules file, or the default list of the `kipi` skill). Never change the code of `{{CODE_REPO}}`: the closed list is the only place you write, wherever it sits.
 
@@ -34,7 +36,7 @@ Without herdr (`herdr agent list` fails) there is nobody to message: only points
 ## What to do
 
 1. Run the Workflow part below from start to end. It is the only home of the workflow: this skill does not repeat its steps.
-2. When that workflow asks for it, read `{{KIPI_HOME}}/workflows/capture.md` (hash, stale, variant files) and `{{VAULT_DIR}}/_meta/conventions.md` (writing rules).
+2. The existence of `{{KIPI_HOME}}/workflows/capture.md` and `{{VAULT_DIR}}/_meta/conventions.md` was already checked in "Before starting". When that workflow asks for it, read them: `capture.md` (hash, stale, variant files) and `conventions.md` (writing rules).
 3. Do not activate the `kipi` skill: neither the greeting nor the menu is needed.
 
 ## What the mandate says
@@ -60,7 +62,9 @@ The single home of the workflow: it is read both by Kipi (the `[UK]` entry of th
 
 **Several keepers may run at once.** There is no wait and no lock. If another keeper is working, follow the protocol "Keepers in parallel" of this skill, above (announce what you touch, answer announcements, re-read before writing). Never stop to wait for another `[UK]` to finish.
 
-Before writing into a chapter read `{{VAULT_DIR}}/_meta/conventions.md` (writing rules) and `{{KIPI_HOME}}/workflows/capture.md` (hash, stale, variant files).
+**Whichever way you arrived** (the `[UK]` entry of the menu or the skill `kipi-update-core`), the checks of "Before starting" at the top of this file run first, before step 1. The existence of the two files below is not left to the moment a step reads them.
+
+Before writing into a chapter read `{{VAULT_DIR}}/_meta/conventions.md` (writing rules) and `{{KIPI_HOME}}/workflows/capture.md` (hash, stale, variant files). Both were confirmed to exist at the start; if a read fails now anyway, stop with the same report (which path, that `[UK]` needed it) and the same rule "Missing files".
 
 **If the mandate is a migration** (split a mixed chapter, bring a file to the current capture format) there are no new facts to collect: skip steps 1 and 2, work with `capture.md` section 4 (and section 7 for a split), and resume here at step 4.
 
@@ -163,6 +167,7 @@ Empty sections are omitted. If there was nothing to apply, one line says so and 
 |---|---|
 | The skill waits for another keeper to finish | Never wait: announce, do the rest, re-read before writing |
 | The skill asks the user questions | It asks none: what cannot be decided goes to "To decide" in the report |
+| The "Before starting" test is read but no tool call looks at the paths, and the run ends silent on a missing file | Look at each path before step 1 with a `Glob`, an `ls` or a `Read`, even when the run turns out to have nothing to apply |
 | The skill changes code in `{{CODE_REPO}}` | Never: it writes only inside the keeper's closed list |
 | The `kipi` persona is loaded for a small update | Do not activate it: this is the light entry |
 | The mandate says "proposals only" and the vault is changed anyway | Proposals only means no write into the vault and none into the state |
@@ -177,9 +182,11 @@ These restate rules of the original keeper (its workflows, its state rules and i
 
 - No pair of keepers has used the parallel protocol yet: it was written after the first real run of the work-item pipeline, where a keeper's update was postponed because another keeper was running, and never exercised by two sessions at once. The messages go through herdr; without it only the re-read-before-write rule is available.
 - The single-branch path (no variants) has not been run on a real project.
+- The existence check of "Before starting" was written after a test where a fresh session read the old wording in full and made no call on the missing file, so `[UK]` ended without a word on it. The new wording ran in one fresh session, with an empty vault and `workflows/capture.md` removed: the session looked at the path with a `Glob` before step 1 and stopped with the report. How reliably a session makes that call, and the case where `[UK]` has a chapter to update, have not been run.
 
 ## Checklist
 
+- [ ] The paths of "Before starting" were looked at with a tool call before step 1, and a missing one stopped the run with its report
 - [ ] Every added line has its source and its status (section 1.1 of the conventions)
 - [ ] No fact of one variant ended up in the file of another
 - [ ] No hash was written without `rev-parse` at the declared commit; no capture was touched without re-reading the sources

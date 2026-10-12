@@ -10,6 +10,8 @@ Kipi manages repository documentation, systematic knowledge organization, and in
 
 This branch is upstream's Kipi with the author's modifications inside it: the same `agent_files/` brain, the same folders, the same capability codes and the same installer, with a different vault contract, a different way to keep the vault current, and an install that asks first. It is used by [onegate](https://github.com/LairdLuca/onegate), a working configuration for Claude Code that installs it into a project after a short interview, and it can also be installed by hand (below). The `main` branch of this fork is identical to upstream.
 
+**Version 1.1.0** of this branch (tagged `onegate-v1.1.0`), see the [changelog](CHANGELOG.md).
+
 ### How it differs from upstream's `main`
 
 | | upstream `main` | this branch |
@@ -69,7 +71,7 @@ Each file whose content changed carries one line after its title: "Modified on t
 
 - the 16 editor skill stubs, the 4 editor commands and the 4 editor READMEs under `agent_files/ide_adapters/` (the path of the Kipi folder is the only change, plus one sentence in the READMEs and, for the update stub and command, no persona);
 - `workshop/2-INSTALL-PROMPT.txt` and `workshop/3-AGENT-BUILDER-PROMPT.txt`, which are pasted whole into a chat, and `docs/folder-structure.excalidraw`, which is JSON;
-- the files this branch adds: `agent_files/workflows/capture.md`, `agent_files/templates/conventions-template.md` and `agent_files/ide_adapters/claude-code/commands/kipi-update.md` (the alias `/kipi-update` of `/kipi-update-core`, Claude Code only).
+- the files this branch adds: `agent_files/workflows/capture.md`, `agent_files/templates/conventions-template.md`, `agent_files/ide_adapters/claude-code/commands/kipi-update.md` (the alias `/kipi-update` of `/kipi-update-core`, Claude Code only) and `CHANGELOG.md` (the versions of this branch).
 
 The 29 files of upstream's folder-contract vault (the step files of the four workflows, the checklists, the batching config, the state schema and twelve templates) are removed: their work is done by the moved workflows. `LICENSE` has one holder line added, and the seven `bmad-skill-manifest.yaml` files are unchanged.
 
@@ -223,7 +225,7 @@ kipi-agent/
 ## Not yet proven
 
 - Agents other than Claude Code (the skills are plain markdown, but only Claude Code has run them).
-- A fresh install on an empty project: the first start (its writes under the editor's folders and to the rules file, and the deletion of the install line from the main skill, under a permission check that may stop them), the copy of the vault skeleton and the first-use creation of the state files (none after a no to the install plan) are written, not exercised.
+- A fresh install on a real project, or with another editor. The first start ran with Claude Code on two toy projects installed by onegate. After a yes, the state files, the writes under the editor's folders and to the rules file, and the removal of the install line from the main skill were not stopped by the permission check; after a no, nothing was written and no state folder was created. A permission check that refuses one of those writes has not been met. The copy of the vault skeleton by `[RI]` is written, not exercised.
 - The single-branch path: only the multi-branch mechanics ran on a real project, in the keeper this branch generalizes.
 - Two keepers working at once with the message protocol of `kipi-update-core`.
-- The in-repo layout (vault and state inside the code repository), and a code repository beside the workspace rather than inside it.
+- The in-repo layout (vault and state inside the code repository) ran only an install by onegate and a first start answered no, on a toy project; no workflow has run in it. A code repository beside the workspace rather than inside it has not run.

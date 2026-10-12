@@ -202,12 +202,12 @@ These restate rules of the keeper this branch generalizes (its workflows, its st
 ## Not yet proven
 
 - Agents other than Claude Code have not run this skill.
-- The first-use creation of the state files and the copy of the vault skeleton are written, not exercised on a fresh project.
+- The first-use creation of the state files ran once, with Claude Code, on a toy project installed by onegate (one variant, `state/<slug>.json` named after it); not on a real project. The copy of the vault skeleton by `[RI]` is written, not exercised.
 - The single-branch path has not run on a real project: only the multi-branch mechanics ran on one.
 - Two keepers running together (the protocol of `kipi-update-core`) have not been observed.
-- The in-repo layout (vault and state inside the code repository), and a code repository beside the workspace rather than inside it. The keeper this branch generalizes ran with the vault in a workspace that holds the code repository as a nested repository.
-- The first start: the writes under the editor's folders and to the rules file, and the removal of the install line from this file, under a permission check that may stop them (inference, not exercised). That a no leaves the state folder uncreated is written, not exercised.
-- The repair proposal when a file a workflow needs is missing, and the copy by hand of a missing file of the brain (not exercised).
+- The in-repo layout (vault and state inside the code repository) ran only an install by onegate and a first start answered no, on a toy project; no workflow has run in it. A code repository beside the workspace rather than inside it has not run. The keeper this branch generalizes ran with the vault in a workspace that holds the code repository as a nested repository.
+- The first start ran with Claude Code on two toy projects installed by onegate. After a yes, the writes under the editor's folders and to the rules file, and the removal of the install line from this file, were not stopped by the permission check; after a no, nothing was written and no state folder was created. A permission check that refuses one of those writes has not been met.
+- The repair proposal when a file a workflow needs is missing ran in two fresh sessions (`[CS]` and `[UK]`, with `workflows/capture.md` removed). Both times the person declined, so the copy by hand of a missing file of the brain has not been run.
 
 ## Resource Reference
 
