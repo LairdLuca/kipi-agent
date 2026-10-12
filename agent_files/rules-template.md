@@ -2,6 +2,7 @@
 # Managed by Kipi (`/kipi-install`). Edit by re-running install or by toggling the
 # block manually between the start/end markers. Content outside the markers is
 # preserved on every Kipi run.
+# Modified on the branch `onegate` of `LairdLuca/kipi-agent`: the vault of this branch, a closed write list, the raw-notes pipeline.
 
 ## Knowledge Verification Protocol (CRITICAL)
 
@@ -26,9 +27,9 @@ Knowledge Doc → Understand Structure → Find Relevant Code → Verify Details
 
 Before responding to any user request:
 
-1. **Check for Core-Knowledge:**
-   - Look for `knowledge/core_knowledge/index.md` in the project root.
-   - If it exists, scan the index (especially the **Folder Contracts** section) to understand the available knowledge.
+1. **Check for the vault:**
+   - Look for `{{VAULT_DIR}}/index.md`.
+   - If it exists, scan the index (the routing table) to understand the available knowledge.
    - Load only the relevant knowledge files based on the user's request.
    - **Use knowledge as a MAP to navigate to actual code.**
 
@@ -76,34 +77,40 @@ Append this message at the end of your response:
 - Maintains a single source of truth for project knowledge.
 - Enables developers to always have accurate context.
 
+### Post-development hook
+
+At the end of a task that changed code in `{{CODE_REPO}}`, propose `kipi-update-core` to bring the vault up to date.
+
 ---
 
 ## Kipi Skill Reference
 
-### `/kipi-update-core`
-**Purpose:** Trigger Kipi to analyze recent changes and update Core-Knowledge.
-**When:** after code changes, after receiving new project info, when documentation may be outdated, periodically for maintenance.
+Kipi's brain is at `{{KIPI_HOME}}`. `{{KIPI_HOME}}/SKILL.md` is the entry; in an editor with no skill or command folder, load `{{KIPI_HOME}}/<skill>/SKILL.md` and run it inline.
+
+### `/kipi-update-core` (`[UK]`)
+**Purpose:** Fold what changed into the vault.
+**When:** after code changes, after receiving new project info, when the vault may be outdated, before a `/clear` or the closing of a session that produced knowledge.
 **What it does:**
-1. Analyzes recent changes or provided information.
-2. Determines which Core-Knowledge files are affected.
-3. Proposes specific updates with rationale.
-4. Waits for user approval before making changes.
-5. Updates Core-Knowledge index if structure changed.
+1. Collects the signals: the session, the ready extractions, the code drift of the chapters in play.
+2. Applies targeted edits to the chapters, each line with its source and its status, then reports what changed. The review happens on the git diff.
+3. Records the fold-in in the state folder. It does not commit.
 
-### `/kipi-developer-interview`
-**Purpose:** Run 10 targeted questions to fill gaps in `core_knowledge/`.
-**When:** after initial structure exists but content is sparse, after onboarding, periodically to refresh stale areas.
-**What it does:** analyses gaps, generates questions, accepts chat or transcript answers, distills (with name + private_knowledge self-checks) into per-file proposals, routes identity content into `team_and_stakeholders/`. Verbatim answers stay in a sidecar log.
+### `/kipi-developer-interview` (`[DI]`)
+**Purpose:** Run 10 targeted questions to fill the gaps the vault declares.
+**When:** after the first chapters exist but content is sparse, after onboarding, periodically.
+**What it does:** ranks the gaps from the vault's own signals, asks one question each, collects the answers in the raw-notes inbox as indications to validate. Nothing is written into the vault from the interview: the answers re-enter through `[UD]` then `[UK]`.
 
-### `/kipi-cleanup-knowledge`
-**Purpose:** Audit Core-Knowledge for structure drift, Hard Rules violations, hygiene issues, and legacy `_about.md` migration.
-**When:** when Kipi flags drift on activation, after major code changes, periodically.
-**What it does:** runs three audits (Structure, Hard Rules, Hygiene), surfaces findings with proposed actions, executes only user-approved actions, generates a cleanup report.
+### `/kipi-cleanup-knowledge` (`[CL]`)
+**Purpose:** Audit the vault against its own writing conventions.
+**When:** after major changes, periodically.
+**What it does:** three passes (structure, rules, hygiene), numbered proposals, and only what the person approves one by one is applied. The sensitive-data pass is never skipped.
 
-### `/kipi-install`
-**Purpose:** Install or refresh Kipi for the IDE(s) configured in BMad.
-**When:** first activation in a new IDE, after upgrading Kipi, when adding a new IDE.
-**What it does:** reads BMad's IDE config, copies the right adapter bundle into the IDE's skill / rules / slash-command locations, caches the resolution at `_bmad/kipi/ide-resolved.yaml`. Idempotent.
+### `/kipi-install` (`[IN]`)
+**Purpose:** Install or repair Kipi for the editors in use.
+**When:** at the first start (Kipi shows the plan by itself), after copying the brain again, when adding an editor, when a stub, a command or this block is missing.
+**What it does:** shows what it will write, asks, then copies the stubs and the commands, writes this block between its markers and records what it wrote. Idempotent.
+
+The other capabilities have no command file: `[RI]` (copy the vault skeleton into an empty vault), `[CS]` (code scan), `[UD]` (raw notes) and `[ST]` (status) are picked from the `/kipi` menu (where the editor has skill stubs, they can also be called by name).
 
 ---
 
@@ -113,63 +120,36 @@ Append this message at the end of your response:
 
 | Folder | Purpose | Kipi Interaction |
 |--------|---------|------------------|
-| `knowledge/core_knowledge/` | Structured knowledge base (shared, pushed to repo) | Kipi writes here |
-| `knowledge/private_knowledge/` | Private notes & raw inputs (git-ignored, local only) | User & Kipi raw-data writes here |
-| `user-data/` | Raw input files (legacy entry point) | Kipi monitors this |
-| `ready-for-classify/` | Processed files | Kipi writes here |
-| `_archive/` | Original files | Kipi archives here |
+| `{{VAULT_DIR}}/` | The knowledge vault: `index.md` (the router), `_meta/conventions.md` (the writing rules), the project's own chapters | Kipi writes here, only through its workflows |
+| `{{RAW_NOTES_DIR}}/` | The raw-notes inbox: pasted messages, call notes, documents | Anyone drops files here; Kipi classifies them |
+| `{{RAW_NOTES_DIR}}/ready-for-classify/` | Extractions waiting to be folded into a chapter | Kipi writes here |
+| `{{RAW_NOTES_DIR}}/_archive/` | The originals, by month, append-only | Kipi archives here and never deletes |
+| `{{KIPI_STATE_DIR}}/` | Kipi's state: per-branch state, chapters, ledger, fold-ins, todo, reports | Kipi writes here |
 
-### Required Directory Structure
+Kipi 🧠 keeps `{{VAULT_DIR}}`. **Knowledge enters the vault ONLY through Kipi's workflows** (`[RI]` skeleton, `[CS]` code scan, `[UD]` raw notes, `[UK]` update, `[DI]` developer interview, `[CL]` audit): no direct write into the vault outside them. The writing conventions of the vault are in `{{VAULT_DIR}}/_meta/conventions.md`. `[DI]` collects answers in the raw-notes inbox and they re-enter through `[UD]`; `[CL]` proposes and never fixes on its own.
 
-Kipi enforces this structure on every initialized repo:
+### Where Kipi may write (closed list)
 
-```
-project-root/
-└── knowledge/
-    ├── core_knowledge/
-    │   ├── index.md                       (routing table + Folder Contracts — single source of truth)
-    │   ├── architecture.md                (system design)
-    │   ├── components/
-    │   ├── infrastructure/
-    │   ├── processes/
-    │   ├── team_and_stakeholders/         (the only place names live)
-    │   └── <optional folders if approved>
-    └── private_knowledge/                 (git-ignored, never referenced from core_knowledge)
-        ├── raw_data/
-        │   ├── emails_team_chats/
-        │   ├── screenshots/
-        │   └── meetings_transcripts/
-        └── personal_tasks/
-```
+`{{VAULT_DIR}}/`, `{{RAW_NOTES_DIR}}/ready-for-classify/`, `{{RAW_NOTES_DIR}}/_archive/` (append-only, never delete), the interview answers file in `{{RAW_NOTES_DIR}}/`, and `{{KIPI_STATE_DIR}}/`. Outside them Kipi does not write: if the code must change, the request goes to the right agent. The only other writes are the installer's, after the person's yes: the editor's skill and command folders, this block between its markers, the record of the install, and the deletion of the install line of `{{KIPI_HOME}}/SKILL.md`.
 
-> **Folder contracts** live in a dedicated section inside `core_knowledge/index.md` — read it before adding new content. (Older Kipi versions used per-folder `_about.md` files; those are migrated by `[CL] Cleanup Knowledge`.)
+**Raw-notes pipeline:** raw files in `{{RAW_NOTES_DIR}}/` are distilled into `ready-for-classify/*.extracted.md` (frontmatter `source_file`, `source_sha256`, `target_chapter`), the originals move to `_archive/<YYYY-MM>/` (append-only), and the fold-in into the vault goes through `[UK]`.
 
 ### Hard Rules (enforced across all writing skills)
 
-1. **Names of people** appear ONLY in `core_knowledge/team_and_stakeholders/`. All other Core-Knowledge files reference roles (e.g. "the platform team lead") and link there.
-2. **`private_knowledge/`** is NEVER referenced (linked, cited, or path-mentioned) from any file in `core_knowledge/`.
-3. **`private_knowledge/`** content is NEVER committed to git. Only `.gitkeep` files preserve the structure.
-
-### Protected Paths
-
-Kipi only writes to these locations:
-- `knowledge/core_knowledge/`
-- `knowledge/private_knowledge/` (raw inputs only; never committed)
-- `ready-for-classify/`
-- `_bmad/_memory/kipi-sidecar/`
-- IDE adapter targets configured in `_bmad/kipi/ide-resolved.yaml` (rules file + skill stubs + slash commands for the detected IDE)
+1. **Names of people** appear only in `{{VAULT_DIR}}/_meta/roles-and-sources.md`, when the vault has one. Everywhere else, refer to people by role label.
+2. **Sensitive data never enters the vault**, in any form: no secret, no real value, no connection string with credentials. Placeholders only (`{{VAULT_DIR}}/_meta/conventions.md`, section 4).
 
 ---
 
 ## Integration with Other Agents
 
-Any BMad agent in this project should:
+Any agent in this project should:
 
-1. **On Activation:** Check `knowledge/core_knowledge/index.md` for relevant context.
-2. **During Work:** Reference Core-Knowledge as a STARTING POINT, then verify specifics in actual code.
-3. **After Changes:** Trigger the Kipi Handshake (suggest `/kipi-update-core`) — **unless you ARE Kipi**.
-4. **Always Remember:** Knowledge docs are a MAP, not the territory — code is the source of truth.
+1. **On Activation:** Check `{{VAULT_DIR}}/index.md` for relevant context.
+2. **During Work:** Reference the vault as a STARTING POINT, then verify specifics in actual code.
+3. **After Changes:** Trigger the Kipi Handshake (suggest `/kipi-update-core`), **unless you ARE Kipi**.
+4. **Always Remember:** Knowledge docs are a MAP, not the territory: code is the source of truth.
 
-**Note:** Kipi is exempt from the handshake protocol since it manages Core-Knowledge directly.
+**Note:** Kipi is exempt from the handshake protocol since it manages the vault directly.
 
 # === Kipi: Project Rules (managed) — end ===

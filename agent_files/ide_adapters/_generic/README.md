@@ -6,6 +6,8 @@ Used when the user's IDE is `other` and Kipi can't auto-detect the right skill /
    - Where does this IDE store agent rules? (path to a rules file or `none` if there isn't one)
    - Does this IDE have a skill / agent definition folder? (path or `none`)
    - Does this IDE support slash-command files? (path or `none`)
-2. Use the answers to write only what's possible. If the IDE has none of the three, Kipi still works via direct invocation (`load _bmad/kipi/SKILL.md and act as Kipi`).
+2. Use the answers to write only what's possible. If the IDE has none of the three, Kipi still works via direct invocation (`load {{KIPI_HOME}}/SKILL.md and act as Kipi`).
 
-The rules block written is the IDE-neutral version from `_bmad/kipi/rules-template.md`, bracketed by the managed start/end markers so it can be safely refreshed.
+The rules block written is the IDE-neutral version from `{{KIPI_HOME}}/rules-template.md`, bracketed by the managed start/end markers so it can be safely refreshed.
+
+When the editor has no skill folder, the first start is the person asking the agent to read `{{KIPI_HOME}}/SKILL.md`: it shows the install plan and asks before writing.
