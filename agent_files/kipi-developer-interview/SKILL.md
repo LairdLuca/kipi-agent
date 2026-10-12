@@ -5,50 +5,35 @@ description: "Run a 10-question developer interview to fill knowledge gaps in Co
 
 # Kipi — Developer Interview
 
+> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: the gap rubric is read from the vault's own signals, and the interview writes nothing into the vault.
+
 ## Overview
 
-Generate 10 targeted interview questions tailored to gaps in the project's Core-Knowledge, collect answers (chat or transcript), distill the answers into name-free, role-based knowledge, and route the digested findings into the right folders inside `core_knowledge/`. Raw transcripts and verbatim answers stay in `private_knowledge/raw_data/meetings_transcripts/`.
+Generate 10 targeted interview questions tailored to the gaps the vault declares, collect the answers (chat or a file), and hand them to the raw-notes pipeline. Answers are indications to validate, never facts.
 
-This is the human-in-the-loop bridge between what's in code and what only lives in a developer's head.
+This is the human-in-the-loop bridge between what is in the code and what only lives in a developer's head.
 
 ## Prerequisites
 
-- Core-Knowledge structure must exist (run `[RI]` first if not)
-- `index.md` must be present
-- Recommended: have already run `[CS] Code Scan Document` once so gaps are well-defined
+- The vault exists (run `[RI]` first if not) and has at least one chapter
+- Recommended: have already run `[CS]` once so the gaps are well defined
 
 ## On Activation
 
-1. Load the workflow definition: `_bmad/kipi/workflows/developer-interview/workflow.md`
-2. Load the checklist: `_bmad/kipi/checklists/developer-interview-checklist.md`
-3. Load the question template: `_bmad/kipi/templates/developer-interview/questions-template.md`
-4. Load the answer-capture template: `_bmad/kipi/templates/developer-interview/answers-template.md`
-5. Check for existing `workflow-state.json` — offer resume if in-progress
-6. Execute the workflow steps sequentially:
-   - `_bmad/kipi/workflows/developer-interview/step-01-analyze-gaps.md`
-   - `_bmad/kipi/workflows/developer-interview/step-02-generate-questions.md`
-   - `_bmad/kipi/workflows/developer-interview/step-03-collect-answers.md`
-   - `_bmad/kipi/workflows/developer-interview/step-04-integrate.md`
-7. Validate against checklist on completion
-8. Return to Kipi menu when done
+1. Load the workflow definition: `{{KIPI_HOME}}/workflows/developer-interview/workflow.md`
+2. Read `{{VAULT_DIR}}/_meta/conventions.md`, section 1.1 (the status of an answer) and section 12 (the communication log)
+3. Read the state file of the branch (`{{KIPI_STATE_DIR}}/state/<slug>.json`) and offer to resume if a workflow is in progress
+4. Execute the workflow steps in order and stop where it says to stop
+5. Return to the Kipi menu when done
 
 ## State Management
 
-Initialize and maintain `{project-root}/_bmad/_memory/kipi-sidecar/workflow-state.json`:
-- Set `workflow_type: "developer-interview"`
-- Track `gaps_detected`, `questions_generated`, `answer_method` (chat | transcript), `answers_collected`, `integration_proposals`
-- Enable resume from any step
+Checkpoint into the state file of the branch after each step (see "State layout" in `{{KIPI_HOME}}/SKILL.md`). Enable resume from any step.
 
 ## User Affordance
 
-When the questions are presented, the skill MUST tell the user upfront:
-
-> "You can answer each question right here in chat — type as much or as little as you want. Or upload a transcript file (meeting notes, recorded interview, voice memo transcription) into `knowledge/private_knowledge/raw_data/meetings_transcripts/` and I'll digest the answers from there. **You don't have to answer any question that doesn't seem relevant — just say 'skip' (or skip it in your transcript). I'll move on.**"
+When the questions are presented, the workflow tells the person the two ways of answering (in chat, or a file left in the raw-notes inbox) and that any question can be skipped. Do not skip that announcement.
 
 ## Hard Rules (inherited from Kipi persona)
 
-These rules apply when this skill writes into `core_knowledge/`. See `_bmad/kipi/SKILL.md` for the full definition.
-
-1. **Names of people** — verbatim answers may contain names; the digested representation written into `core_knowledge/` MUST use roles. Identity-bearing content (contacts, ownership) is routed into `team_and_stakeholders/` instead.
-2. **No `private_knowledge/` references** — even though answers may be stored as transcripts in `private_knowledge/raw_data/meetings_transcripts/`, the resulting `core_knowledge/` files must NOT link to or path-mention them. They must be self-contained.
-3. **Self-check before writing** — every generated `core_knowledge/` file is scanned for human names outside `team_and_stakeholders/` and any `private_knowledge` paths; redact, reroute, or refuse to write if found.
+The write list and the rules of the vault are those of `{{KIPI_HOME}}/SKILL.md` ("Where Kipi may write" and "Hard Rules"). Verbatim answers go only to `{{RAW_NOTES_DIR}}/`, never into the vault, and they carry the role label of who answered, never a name.

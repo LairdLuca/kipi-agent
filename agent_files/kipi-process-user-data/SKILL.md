@@ -1,46 +1,33 @@
 ---
 name: kipi-process-user-data
-description: "Process new files in user-data/ folder into structured documents. Use when Kipi selects [UD] or user says 'process user data' or 'process new files'."
+description: "Process files dropped in the raw-notes inbox into structured extractions. Use when Kipi selects [UD] or user says 'process user data' or 'process new files'."
 ---
 
 # Kipi — Process User Data
 
+> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: the inbox is the raw-notes folder, with a ledger, an append-only archive and a source status by channel.
+
 ## Overview
 
-Process files dropped into the `user-data/` folder, transforming them into structured, classified documents ready for integration into Core-Knowledge.
+Process the files dropped into the raw-notes inbox `{{RAW_NOTES_DIR}}/`: pasted messages, call notes, documents. Each one becomes a structured extraction in `ready-for-classify/`, ready to fold into a chapter with `[UK]`.
 
 ## On Activation
 
-1. Load the workflow definition from `_bmad/kipi/workflows/process-user-data/workflow.md`
-2. Load the checklist from `_bmad/kipi/checklists/process-user-data-checklist.md`
-3. Load the classification rules from `_bmad/kipi/data/knowledge-classification.csv`
-4. Load the template from `_bmad/kipi/templates/processed-file-template.md`
-5. Load `_bmad/_memory/kipi-sidecar/processed-files.md` for tracking
-6. Check for existing `workflow-state.json` — offer resume if in-progress
-7. Execute the workflow steps sequentially:
-   - `_bmad/kipi/workflows/process-user-data/step-01-process.md`
-8. Validate against checklist on completion
-9. Return to Kipi menu when done
+1. Load the workflow definition from `{{KIPI_HOME}}/workflows/process-user-data/workflow.md`
+2. Load the classification table from `{{KIPI_HOME}}/data/knowledge-classification.csv`
+3. Read `{{VAULT_DIR}}/_meta/conventions.md`, section 1.1: the channel decides the status of the information
+4. Read the lines of `ledger.jsonl` for the files in play (never the whole file) and the state file of the branch; offer to resume if a workflow is in progress
+5. Execute the workflow
+6. Return to the Kipi menu when done
 
 ## State Management
 
-Initialize and maintain `{project-root}/_bmad/_memory/kipi-sidecar/workflow-state.json`:
-- Set `workflow_type: "process-user-data"`
-- Track `files_to_process`, `files_processed`, `files_failed`
-- Enable resume if interrupted mid-processing
+Checkpoint into the state file of the branch (see "State layout" in `{{KIPI_HOME}}/SKILL.md`) and keep one ledger line per processed file. Enable resume if interrupted mid-processing.
 
 ## File Operations
 
-For each processed file:
-1. Save structured output to `ready-for-classify/{content-type}/`
-2. Move original to `_archive/`
-3. Update `processed-files.md` with timestamp and content type
-4. Purge file contents from context, keep only summary
+For each processed file, in this order: write `ready-for-classify/<name>.extracted.md`, move the original to `_archive/<YYYY-MM>/` (append-only, never delete from it), write its one line in `ledger.jsonl`, or edit it if the path already has one. Purge the file contents from context and keep only a summary.
 
 ## Hard Rules (inherited from Kipi persona)
 
-When transforming user-data files into Core-Knowledge candidates, see `_bmad/kipi/SKILL.md` for the full definition.
-
-1. **Names of people** appear ONLY in `core_knowledge/team_and_stakeholders/`. When this skill produces output destined for `core_knowledge/`, replace names with roles and route identity-bearing content into the `team_and_stakeholders/` folder instead.
-2. **No `private_knowledge/` references** — output destined for `core_knowledge/` must never link to or path-mention `private_knowledge/`. Raw inputs may live there, but their digested representation must be self-contained.
-3. **Self-check before writing** — scan every generated file for human names outside `team_and_stakeholders/` and any `private_knowledge` paths; redact, reroute, or refuse to write if found.
+The write list and the rules of the vault are those of `{{KIPI_HOME}}/SKILL.md` ("Where Kipi may write" and "Hard Rules"). Names of people never go into an extraction; sensitive data is replaced by its placeholder.

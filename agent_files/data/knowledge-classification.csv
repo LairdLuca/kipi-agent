@@ -1,27 +1,25 @@
-content_type_id,display_name,description,source_patterns,target_chapter,extraction_rules,metadata_fields,priority,auto_classify
-transcript,Meeting Transcript,Transcribed audio/video meetings or calls,"*transcript*;*meeting*;*call*;*recording*;*.vtt;*.srt",decisions,Extract decisions/action items/key points/participants,participants;date;duration;topics,high,true
-requirements,Requirements Document,Product/technical requirements or specifications,"*requirement*;*spec*;*prd*;*functional*;*non-functional*",requirements,Extract must-have/should-have/nice-to-have items,priority_level;stakeholder;status,high,true
-architecture,Architecture Document,System design and architectural decisions,"*architecture*;*design*;*system*;*infrastructure*;*diagram*",architecture,Extract components/integrations/patterns/rationale,tech_stack;patterns;diagrams,high,true
-api_spec,API Specification,API documentation or contracts,"*api*;*openapi*;*swagger*;*graphql*;*.proto",api-reference,Extract endpoints/schemas/auth/examples,version;base_url;auth_type,high,true
-user_story,User Story,Agile user stories or tickets,"*story*;*ticket*;*issue*;*epic*;*feature*",requirements,Extract acceptance criteria/user value/tasks,story_points;sprint;assignee,medium,true
-meeting_notes,Meeting Notes,Handwritten or informal meeting notes,"*notes*;*minutes*;*standup*;*retro*;*planning*",decisions,Extract decisions/action items/blockers,date;attendees;type,medium,true
-code_review,Code Review,PR reviews or code feedback,"*review*;*pr*;*pull-request*;*feedback*",development,Extract issues found/suggestions/patterns,reviewer;files_changed;approval,medium,true
-research,Research Document,Research findings or analysis,"*research*;*analysis*;*findings*;*investigation*",research,Extract conclusions/data/methodology,topic;date;sources,medium,true
-onboarding,Onboarding Material,Developer or user onboarding docs,"*onboarding*;*getting-started*;*setup*;*quickstart*",getting-started,Extract setup steps/prerequisites/common issues,role_type;estimated_time,medium,true
-runbook,Runbook or Playbook,Operational procedures and playbooks,"*runbook*;*playbook*;*procedure*;*ops*;*incident*",operations,Extract steps/conditions/rollback/contacts,severity;services_affected,high,true
-postmortem,Incident Postmortem,Incident analysis and lessons learned,"*postmortem*;*incident*;*outage*;*failure*",operations,Extract timeline/root cause/action items,incident_date;severity;duration,high,true
-changelog,Changelog,Release notes and version history,"*changelog*;*release*;*whatsnew*;*version*",releases,Extract version/changes/breaking/deprecated,version;date;contributors,low,true
-adr,Architecture Decision Record,Documented architecture decisions,"*adr*;*decision*;*rfc*;*proposal*",architecture,Extract context/decision/consequences/alternatives,status;date;deciders,high,true
-config_doc,Configuration Documentation,Environment and config documentation,"*config*;*env*;*settings*;*variables*",configuration,Extract variables/defaults/descriptions/secrets,environment;required;sensitive,medium,true
-troubleshooting,Troubleshooting Guide,Problem resolution documentation,"*troubleshoot*;*debug*;*faq*;*problem*;*error*",troubleshooting,Extract symptoms/causes/solutions,error_codes;frequency,medium,true
-deployment,Deployment Documentation,Deployment processes and environments,"*deploy*;*release*;*ci-cd*;*pipeline*",deployment,Extract steps/environments/rollback/monitoring,environment;frequency;approvals,high,true
-data_model,Data Model Documentation,Database schemas and data dictionaries,"*schema*;*model*;*entity*;*database*;*erd*",data-models,Extract entities/relationships/constraints,database_type;version,high,true
-security,Security Documentation,Security policies and vulnerability info,"*security*;*vulnerability*;*audit*;*penetration*;*compliance*",security,Extract vulnerabilities/mitigations/policies,severity;compliance_standard,high,true
-test_plan,Test Plan or Strategy,Testing approach and coverage,"*test-plan*;*test-strategy*;*coverage*;*qa*",testing,Extract scope/approach/tools/coverage targets,test_types;coverage_target,medium,true
-interview,User Interview,User research and interview transcripts,"*interview*;*user-research*;*feedback*;*survey*",research,Extract pain points/needs/quotes/insights,participant_type;date;methodology,medium,true
-screenshot,Screenshot or Image,Visual captures with annotations,"*.png;*.jpg;*.jpeg;*.gif;*.webp",visual-reference,Extract context/annotations/related feature,feature;date;source,low,false
-log_file,Log File,Application or system logs,"*.log;*logs*;*output*;*.txt",troubleshooting,Extract errors/warnings/patterns/timestamps,log_level;service;time_range,low,false
-email,Email Thread,Email conversations and threads,"*email*;*mail*;*thread*;*correspondence*",communications,Extract decisions/action items/key participants,participants;date;thread_length,low,true
-slack,Chat/Slack Export,Team chat or Slack exports,"*slack*;*chat*;*discord*;*teams*",communications,Extract decisions/links/key discussions,channel;date_range;participants,low,true
-unknown,Unknown/General,Content that doesn't match other categories,N/A,inbox,Extract summary/topics/potential classification,detected_keywords,low,false
-
+# Modified on the branch `onegate` of `LairdLuca/kipi-agent`: classification table with a source-status column that applies section 1.1 of _meta/conventions.md (the channel decides the status of the information).
+# Target chapters are described by role (the chapter of the concept touched), never by a fixed section number: each vault names its own sections in index.md.
+# Used by [UD] Process User Data (the raw-notes inbox) as a first attempt at classification. Low confidence or an unrecognised pattern means ask, never guess. Cells hold no commas; ; separates the items of a list.
+type_id,name,file_name_pattern,target_chapter,source_status,what_to_extract,priority,auto_classify
+task_text,Text of a work item,task-*,chapter of the variant or area the item touches,requirement (may contain ambiguity),Requirement;acceptance criteria;variant and branch;item number,high,yes
+dev_report,Development report of an agent,dev-report-*,chapter of the concept touched,to re-verify in source before the fold-in,Files and lines touched;decisions taken;declared risks;commit,high,yes
+handoff,Handoff between agents,handoff-*,chapter of the concept touched,to re-verify in source before the fold-in,What to carry and where;dated facts with commit;open points,high,yes
+test_round_report,Report of a test round,round-*;test-round-*;report-cases-*,chapter of the concept touched + the variant chapter,verified fact on screen (state the test record and the environment),Cases passed and failed;records and environment used;defects out of scope,high,yes
+analysis,Preliminary analysis,analysis-*,chapter of the concept touched,hypothesis until re-verified,Hypotheses;evidence read;open questions,medium,yes
+call_transcript,Notes or transcript of a call,call *;*transcript*;*meeting*,communication log of the relevant chapter,indication to validate,Decisions announced;who said what;date and time;actions,high,yes
+email,Email thread,*email*;*mail*,communication log of the relevant chapter,written indication to validate,Indications;constraints declared;sender and date,medium,yes
+communication_log,Log of communication with the team,communication-log-*,communication log of the relevant chapter,indication to validate,Text sent;recipient;date and time;state of the reply,medium,yes
+team_questions,Questions sent to the team,team-questions-*,open points of the chapter + the state file of the variant,open question (not knowledge until someone answers),Question;recipient;date;state,medium,yes
+reviewer_reply,Reply of a reviewer or a project manager,*reply*;*response*,relevant chapter + communication log,decision taken (if explicit) otherwise indication,Decision;rationale;what stays open,high,yes
+team_roster,Who is who (a role or a team change),no file name pattern: recognised from the content,_meta/roles-and-sources.md,direct statement of the human (informal channel but direct source),Role label;role;internal or external;areas of competence;date of the statement,high,yes
+interview,Answers to a developer interview,developer-interview-*,chapters named by the [DI] workflow,indication to validate,Answer per question;channel;author role;date,high,yes
+lessons,Technical lessons collected,lessons-*,several chapters (one lesson per chapter),depends on the lesson,Lesson;target chapter;whether it is already documented,medium,yes
+reminder,Reminder or doubt to measure,reminder-*,open-items list (todo.jsonl),open doubt,What to verify;where;why it is open,medium,yes
+keeper_brief,Process brief for Kipi,kipi-brief-*,none (input of a workflow),not knowledge,Instructions for the workflow,low,yes
+publication_draft,Draft of a pull request or work item comment,draft-*,none (stays in the reports folder),not knowledge,Text published or to publish;what was cut,low,yes
+screenshot,Screenshot or image,*.png;*.jpg;*.jpeg;*.gif,none (referenced from the chapter),evidence on screen,What it shows;which screen;test record and environment,low,no
+env_error,Build or environment error,*build*;*error*;*setup*,_meta/env-troubleshooting-log.md,verified fact if reproduced,Message;project;cause;workaround,medium,yes
+code_review,Code review or pull request comments,*review*;*pr-*;*pull-request*,chapter of the concept touched + communication log,indication of the reviewer to validate,Findings;decisions;what was accepted,high,yes
+decision_record,Architectural decision,*adr*;*decision*,relevant chapter + the project's decision records,decision taken,Context;decision;consequences;alternatives rejected,high,yes
+unknown,Not classified,N/A,ask,unknown,Summary;keywords detected;candidate chapter,low,no

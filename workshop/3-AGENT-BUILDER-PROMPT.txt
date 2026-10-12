@@ -1,11 +1,11 @@
 /bmad-agent-builder I want suggestions for custom agents that would meaningfully improve my work on THIS project — not generic ideas.
 
-Ground your thinking in this repo's `core_knowledge` directory. That's where you'll find this project's architecture, components, people, conventions, and workflows. If core_knowledge is thin in places or has open questions flagged, tell me what you wish you knew before you suggest anything.
+Ground your thinking in this project's knowledge vault: open its `index.md` (the `knowledge/` folder, unless the install chose another one) and follow its routing table. That's where you'll find this project's architecture, components, people, conventions, and workflows. If the vault is thin in places or has open questions flagged, tell me what you wish you knew before you suggest anything.
 
 I want breadth, not the obvious. Don't default to "code reviewer" or "PR summarizer" — those are shallow if they're only reviewing pull requests. Push for ideas that are specific to THIS project: its quirks, its real pain points, the things only someone working in this codebase regularly would even notice.
 
 Consider the whole project, not one slice of it:
-- Different components and layers (whatever you find in core_knowledge — frontend, backend, infra, data, services, anything else)
+- Different components and layers (whatever you find in the vault: frontend, backend, infra, data, services, anything else)
 - Different people (maintainer, contributors, future onboarders, consumers of the project)
 - Different workflows (building new features, debugging, reviewing, onboarding, releasing, supporting)
 
@@ -16,7 +16,7 @@ Before suggesting anything, ask me 3 to 5 questions that would sharpen your thin
 Then give me at least 3 distinct agent ideas. For each one, tell me:
 1. What the agent does (one sentence)
 2. Why a custom agent is the right shape — and not a skill, not a generic prompt
-3. What in core_knowledge it would lean on
+3. What in the knowledge vault it would lean on
 4. The smallest version I could build to test the idea (the MVP)
 
 Don't generate any agent yet. I'll pick one and we'll build it together.

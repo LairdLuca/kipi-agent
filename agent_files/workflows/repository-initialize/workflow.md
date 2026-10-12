@@ -1,121 +1,36 @@
-# Repository Initialize Workflow
+# Workflow `[RI]`: Repository Initialize
+
+> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: copies the vault skeleton and creates the folders of first use; there is no scan and no proposal of a structure.
+
+Goal: give an empty vault the two files the other capabilities rely on, a router and a contract. The sections of the vault are not decided here: they are the project's own and are added by `[CS]`.
 
 **Workflow ID:** `repository-initialize`
-**Purpose:** Initialize Core-Knowledge structure for a new repository
-**Menu Trigger:** `[RI]` or fuzzy match on `repo-init`
+**Menu Trigger:** `[RI]`
 
 ---
 
-## Overview
+1. **Check the vault.** List `{{VAULT_DIR}}`. If it holds `index.md` and `_meta/conventions.md` already, the vault is initialized: say so, suggest `[CS]`, and stop. If it holds other files but not both, **stop and say so**: `[RI]` never runs on a vault that has content, and never overwrites.
+2. **Say what will be written and wait for the OK:**
+   - `{{VAULT_DIR}}/index.md`, from `{{KIPI_HOME}}/templates/index-template.md`
+   - `{{VAULT_DIR}}/_meta/conventions.md`, from `{{KIPI_HOME}}/templates/conventions-template.md`
+   - the raw-notes folders when missing: `{{RAW_NOTES_DIR}}/`, `{{RAW_NOTES_DIR}}/ready-for-classify/`, `{{RAW_NOTES_DIR}}/_archive/`
+   - the state files of first use, only the missing ones (the table "First use" of `{{KIPI_HOME}}/SKILL.md`)
+3. **Copy.** Copy the two templates as they are. Never rebuild them from memory. If a placeholder (a name written between double braces) is left in a copied file, stop and ask: the install did not fill it.
+4. **Create the folders and the state files** that are missing. Never overwrite an existing file.
+5. **Report.** One screen: what was created and what already existed. Then suggest `[CS]` on the area that is needed first, and `[UD]` if the raw-notes inbox already holds files.
 
-This workflow scans a repository, proposes a tailored Core-Knowledge structure, and implements it with user approval at each step.
+`[RI]` does not commit.
 
----
+## Common mistakes
 
-## Configuration
+| What happens | Remedy |
+|---|---|
+| The skeleton is rebuilt from memory because a template is missing | Stop: a missing file of the brain is repaired by copying `agent_files/` again, not by writing from memory |
+| `[RI]` runs on a vault that has chapters | It never does: say that the vault is initialized, or stop and ask |
+| The state folder is recreated and a line of another session is lost | Create only what is missing |
 
-```yaml
-workflow_type: repository-initialize
-state_file: {project-root}/_bmad/_memory/kipi-sidecar/workflow-state.json
-output_folder: {project-root}/knowledge/core_knowledge/
-templates:
-  index: {agent-root}/templates/index-template.md
-checklist: {agent-root}/checklists/repository-initialize-checklist.md
-```
+These restate rules of the keeper this branch generalizes (its state rules and its vault conventions) as mistakes to avoid.
 
----
+## Not yet proven
 
-## Workflow Architecture
-
-This uses **micro-file architecture** for disciplined execution:
-
-- Each step is a self-contained file with embedded rules
-- Sequential progression with user control at each step
-- State tracked in workflow-state.json
-- You NEVER proceed to next step without user approval
-
----
-
-## Prerequisites
-
-Before starting:
-1. Confirm project root directory with user
-2. Check if knowledge/core_knowledge/ already exists
-3. If exists: ask user about fresh start vs update
-
----
-
-## Execution Steps
-
-### Step 1: Scan Repository
-**File:** `./step-01-scan.md`
-
-- Scan repository structure and characteristics
-- Identify language, framework, patterns
-- Present scan summary to user
-- ⏸️ STOP for acknowledgment
-
-### Step 2: Propose Structure
-**File:** `./step-02-propose.md`
-
-- Generate the tailored proposal in a SINGLE review screen (baseline + optional folders + monorepo layout)
-- Pre-select decisions based on scan signals; user can toggle anything
-- Render the final tree preview with all current selections
-- ⏸️ STOP for user approval or edits
-
-### Step 3: Implement Structure
-**File:** `./step-03-implement.md`
-
-- Create knowledge/core_knowledge/ folder
-- Generate index.md from template (includes Folder Contracts section — single source of truth)
-- Create approved folders (each with .gitkeep, no per-folder _about.md)
-- Create the 3 mandatory team_and_stakeholders/ files
-- Create private_knowledge/ tree with .gitkeep files; configure .gitignore
-- ⏸️ STOP with completion summary
-
----
-
-## Initialization
-
-When this workflow is triggered:
-
-1. Check for existing workflow-state.json
-2. If exists with workflow_type="repository-initialize" and not completed:
-   - Ask: "Resume from {{current_step}} or start fresh?"
-3. If starting fresh:
-   - Initialize new workflow-state.json
-   - Load and execute `./step-01-scan.md`
-
----
-
-## State Management
-
-After each step:
-```json
-{
-  "workflow_type": "repository-initialize",
-  "current_step": "step_X_name",
-  "completed_steps": [...],
-  "findings": { ... },
-  "resume_instructions": "..."
-}
-```
-
----
-
-## Completion
-
-When Step 3 completes:
-1. Validate against checklist
-2. Set workflow state to completed
-3. Inform user: "Core-Knowledge structure initialized. Ready for [CS] Code Scan."
-4. Return to Kipi menu
-
----
-
-## Error Handling
-
-- If any step fails: save state, inform user, offer retry
-- If user cancels: save partial progress, return to menu
-- State file enables resume from any step
-
+- The copy of the skeleton and the creation of the state files are written, not exercised on a fresh project.

@@ -1,186 +1,141 @@
-# Developer Interview Workflow
+# Workflow `[DI]`: Developer Interview
 
-**Workflow ID:** `developer-interview`
-**Purpose:** Fill Core-Knowledge gaps via 10 targeted developer interview questions
-**Menu Trigger:** `[DI]` or fuzzy match on `developer-interview`, `interview`, `fill gaps`
+> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: gap rubric read from the vault's own signals, answers are indications to validate.
 
----
+Rewritten on the signals of this vault: the gap rubric and the rules on answers are NOT upstream's.
 
-## Overview
-
-Kipi analyzes the current state of `core_knowledge/`, identifies the 10 most valuable gaps to close, generates one question per gap, collects answers from the developer (in chat or via uploaded transcript), distills the answers into name-free, role-based knowledge, and proposes specific updates across `core_knowledge/`.
-
-The user can answer each question in chat or skip it; or they can upload a transcript that covers some/all questions and Kipi will extract the relevant answers.
+Goal: close the knowledge gaps that **are not in the code** but in somebody's head (the senior developer, the project manager, the customer contact). Kipi generates 10 targeted questions, collects the answers and brings them back into the vault **through the existing pipeline** (`{{RAW_NOTES_DIR}}/` → `[UD]` → `ready-for-classify/` → `[UK]`), never by direct write.
 
 ---
 
-## Configuration
+## Non-negotiable rules
 
-```yaml
-workflow_type: developer-interview
-state_file: {project-root}/_bmad/_memory/kipi-sidecar/workflow-state.json
-core_knowledge_root: {project-root}/knowledge/core_knowledge/
-private_knowledge_root: {project-root}/knowledge/private_knowledge/
-transcript_inbox: {project-root}/knowledge/private_knowledge/raw_data/meetings_transcripts/
-templates:
-  questions: {agent-root}/templates/developer-interview/questions-template.md
-  answers: {agent-root}/templates/developer-interview/answers-template.md
-checklist: {agent-root}/checklists/developer-interview-checklist.md
-question_count: 10
+1. **An answer given in chat or by voice is not a fact.** Section 1.1 of `_meta/conventions.md` applies: it enters as an *indication to validate*, with channel and date. It becomes a fact only after verification in source. An answer that contradicts a chapter **does not rewrite it**: it opens a communication-log line (section 12) and stays open.
+2. **People are recorded by role label.** Upstream keeps names in one folder; this vault keeps them in one file, `_meta/roles-and-sources.md`, when the vault has it. Answers carry the role label of who answered, the channel and the date, which is what lets someone rebuild on which basis a decision was taken (section 12). Never write a proper name into a chapter.
+3. **Kipi does not write into `{{VAULT_DIR}}` from this workflow.** The only direct output is the raw answers file in `{{RAW_NOTES_DIR}}/`. The fold-in goes through `[UD]` and `[UK]` like any other source.
+4. **No question is mandatory.** "skip" is a valid answer and is not asked again.
+5. **No questions the code answers.** If the answer is found by reading a file, the question is wrong: read the file.
+
+---
+
+## Step 1: Gap analysis
+
+Walk `{{VAULT_DIR}}` and score every chapter. The vault already declares its own gaps: the rubric reads them, it does not guess them.
+
+| Signal (where it is read) | Weight |
+|---|---|
+| `status: placeholder` in the frontmatter | +0.40 |
+<!-- onegate-if: multi-branch -->
+| `complete (baseline view)` in `index.md`: chapter written without checking out the variant's branch | +0.35 |
+<!-- onegate-endif -->
+| The chapter declares it read a source **only as signatures** or "internal logic not read" | +0.30 |
+| `status: stale` or `source_files_hashes` diverging from the code | +0.30 |
+<!-- onegate-if: multi-branch -->
+| A `(not verified)` row in the `## Variants` table (section 3 of the conventions) | +0.30 (cap, not per row) |
+<!-- onegate-endif -->
+| Open TODO in `{{KIPI_STATE_DIR}}/todo.jsonl` (`status: open`) or in the `_summary.md` of the section | +0.25 |
+| Open item in `{{KIPI_STATE_DIR}}/state/<slug>.json` → `open_items` | +0.25 |
+| Communication-log line with `**State:** awaiting answer` older than 7 days | +0.25 |
+| A statement marked `(inference, to be verified)` (section 1.1) | +0.20 |
+| A decision recorded without the **why** (what was decided, not on which constraint) | +0.20 |
+| `last_updated` over 90 days old **and** sources in scope modified | +0.20 |
+
+Sum per chapter, cap at 1.0. Sort, keep the first 10, **diversify across sections** (not all 10 from the same one).
+
+**Questions already queued.** Before reading anything from `{{KIPI_STATE_DIR}}/todo.jsonl`, **filter on `status` and on `kind`**. The file has one line per item with a unique key: there are no chains to resolve, but there are two filters not to skip. On the first, only `open` is interview material: a closed item, one waiting for somebody else's answer or one downgraded to a reminder is not. On the second, the vault backlog (`kind: vault-backlog`: things to investigate or document, never started) **is not interview material**: it is the keeper's work, not knowledge in somebody's head. A closed question that reappears in an interview is a reading error, not a knowledge gap.
+
+After that, the items with `di_candidate: true` that are **still current** carry a `question` field already worded: they are points somebody decided to ask and that only wait for an interview. They enter the list **without being re-derived** and take places among the 10, first on equal score. If there are more than 10, show the excess to the user and have them say which to keep: do not drop them silently. When one is answered, **edit its line** in `todo.jsonl`, setting `status` to `closed` and noting on the same line when and by whom the answer came: the file has one line per `id`, do not append a second.
+
+For each one record: `id`, `chapter`, `gap_type` (`baseline-view` | `logic-not-read` | `stale` | `inference` | `open-todo` | `unanswered-log` | `missing-rationale`), `score`, `why` (1 or 2 sentences), `likely recipient` (the role that can answer: senior developer or reviewer, project manager, customer contact, or the human).
+
+Show the table and **stop**. The user can approve, remove, replace or ask for another ranking.
+
+---
+
+## Step 2: Generate the 10 questions
+
+One question per gap, exactly 10. Short (1 to 3 sentences), one thing only, and it says **where the answer will end up**.
+
+| Gap type | Question pattern |
+|---|---|
+| `baseline-view` | "On `{variant}`, is `{concept}` identical to the baseline or does it diverge? If it diverges, in which project or path does it live?" |
+| `logic-not-read` | "In `{class}`, I read `{method}` only as a signature: what does it really do, and which edge cases does it handle that the signature does not show?" |
+| `stale` | "In `{chapter}` the code changed: what changed **as a decision**, beyond what the diff shows?" |
+| `inference` | "I had deduced that `{hypothesis}` starting from `{source}`. Is that so, or am I missing a piece?" |
+| `open-todo` | "`{todo}`: is it still open, superseded, or somebody's job?" |
+| `unanswered-log` | "On `{date}` I forwarded `{question}` and no answer came: do I raise it again or has it lapsed?" |
+| `missing-rationale` | "Why `{choice}` rather than `{alternative}`? Is there a constraint, a port or a history behind it?" |
+
+Always adapt, do not copy the patterns literally.
+
+When presenting the questions, **announce the two ways of answering and the possibility to skip**:
+
+> You can answer here in chat, numbering (`1. ...`, `2. ...`), or leave a file of answers (call notes, a transcript, an exported email thread) in `{{RAW_NOTES_DIR}}/` and tell me its name: I process it with `[UD]`. No question is mandatory: write "skip" and I move on.
+
+Stop and wait.
+
+---
+
+## Step 3: Collection
+
+Record for every question: `answer` | `skipped`, the **channel** (chat, call, email, work item) and the **date**, plus the role label of who answered.
+
+The raw answers go in a single file:
+
+```
+{{RAW_NOTES_DIR}}/developer-interview-<YYYY-MM-DD>.md
 ```
 
----
+with the provenance header (role label, when, channel) and the verbatim answers, one per question. If the source was already a file uploaded by the user, that file **is** the original: do not copy it again, refer to it.
 
-## Workflow Architecture
-
-```
-workflow.md (this file)
-├── step-01-analyze-gaps.md       # Detect what's missing in core_knowledge
-├── step-02-generate-questions.md # Produce 10 targeted questions, present + offer skip
-├── step-03-collect-answers.md    # Collect via chat OR transcript; allow skips
-└── step-04-integrate.md          # Distill answers into core_knowledge updates with self-check
-```
+No line of this file enters `{{VAULT_DIR}}` in this step.
 
 ---
 
-## Prerequisites
+## Step 4: Hand-over to `[UD]` and `[UK]`
 
-Before starting:
-1. `knowledge/core_knowledge/index.md` must exist (run `[RI]` first)
-2. `knowledge/private_knowledge/raw_data/meetings_transcripts/` must exist (created by `[RI]`)
-3. Recommended: `[CS] Code Scan Document` has been run at least once
+Do not integrate from here. Summarise for the user:
 
----
+- N answers collected, M skipped
+- the raw file produced in `{{RAW_NOTES_DIR}}/`
+- for every answer, the expected destination chapter and the **status** it will have under section 1.1 (`indication to validate` almost always; `verified fact` only if the answer was already checked in source during the interview)
+- the answers that **contradict** the vault: list them apart, because each one becomes a communication-log line and an open item, not a rewrite
 
-## Execution Steps
-
-### Step 1: Analyze Gaps
-**File:** `./step-01-analyze-gaps.md`
-
-- Read the routing table, coverage table, and Folder Contracts section from `index.md`
-- Walk every baseline folder + approved optional folders
-- Score each location for "knowledge gap": placeholder text, low file count, file marked "⬜ Not written", folder absent of any content files, missing `_template.md` despite multiple similar files, narrowed/expanded contract relative to the canonical scope
-- Cross-reference against codebase signals from prior scans
-- Produce a ranked list of the top 10 gap candidates with rationale
-- ⏸️ STOP, present ranked gap list, ask user "approve / re-rank / drop some"
-
-### Step 2: Generate Questions
-**File:** `./step-02-generate-questions.md`
-
-- For each of the 10 approved gaps, formulate ONE focused question
-- Each question:
-  - Names the gap it addresses (so user knows what it's filling)
-  - Asks for context that wouldn't be obvious from code alone
-  - Is short and specific (not "tell me about the system")
-- ⏸️ STOP, present all 10 questions in a numbered list
-- Tell user upfront (verbatim):
-
-  > "**You can answer in two ways:**
-  > 1. **In chat** — reply with answers. Use formatting like '1. ...', '2. ...', '3. skip', etc.
-  > 2. **Upload a transcript** — drop a file (notes, voice-memo transcript, recorded meeting transcript, anything text-based) into `knowledge/private_knowledge/raw_data/meetings_transcripts/`, then tell me the filename and I'll extract answers from it.
-  >
-  > **You can skip any question that doesn't feel relevant — just say 'skip' or leave it out. There's no penalty.**"
-
-- Save the questions to a working file (in workflow-state.json or a sidecar file)
-
-### Step 3: Collect Answers
-**File:** `./step-03-collect-answers.md`
-
-- Wait for user input
-- If user replies in chat: parse per-question answers, mark skipped questions
-- If user provides a transcript filename: read the file from `private_knowledge/raw_data/meetings_transcripts/`, extract answers per question (matching by topic), mark unanswered as skipped
-- For each answer, capture:
-  - Original question
-  - Raw answer (verbatim)
-  - Source: `chat` or `transcript:<filename>`
-  - Status: `answered` / `skipped`
-- ⏸️ STOP, present a summary table: which questions were answered, which were skipped
-- Save raw answers (verbatim) into a sidecar log: `_bmad/_memory/kipi-sidecar/developer-interview/<date>-answers.md`. **Do not write verbatim names or details into `core_knowledge/` yet.**
-
-### Step 4: Integrate Knowledge
-**File:** `./step-04-integrate.md`
-
-For each answered question, propose an integration:
-- Which file in `core_knowledge/` should be updated/created
-- What new content the answer adds (DISTILLED — not verbatim)
-- The distillation process applies the Hard Rules:
-  - Replace human names with roles
-  - Route identity-bearing content into `team_and_stakeholders/`
-  - Strip any reference to `private_knowledge/`
-- Present each proposal one-at-a-time for user approval
-- For each approved proposal, write the file (with self-check before save)
-- Update `index.md` coverage table
-- Save the run report to `_bmad/_memory/kipi-sidecar/developer-interview/<date>-report.md`
+Then propose `[UD] Process User Data (the raw-notes inbox)` on the file just written. End of the workflow.
 
 ---
 
-## State Management
+## Common mistakes
 
-```json
-{
-  "workflow_type": "developer-interview",
-  "current_step": "step_X_name",
-  "completed_steps": [...],
-  "findings": {
-    "gaps_detected": [
-      {"id": 1, "location": "components/auth-service.md", "type": "placeholder-only", "score": 0.95, "rationale": "..."}
-    ],
-    "questions_generated": [
-      {"id": 1, "gap_id": 1, "question": "..."}
-    ],
-    "answer_method": "chat | transcript",
-    "answer_source": "chat | transcript:<filename>",
-    "answers_collected": [
-      {"q_id": 1, "status": "answered | skipped", "raw_answer_path": "_bmad/_memory/kipi-sidecar/developer-interview/<date>-answers.md#q1"}
-    ],
-    "integration_proposals": [
-      {"q_id": 1, "target_file": "...", "approved": null, "applied": false}
-    ]
-  },
-  "resume_instructions": "..."
-}
-```
+| What happens | Remedy |
+|---|---|
+| The questions are generated before the list of gaps is approved | Stop after the table of step 1 and wait |
+| A spoken answer is treated as a requirement | It is an indication to validate, with channel and date |
+| An answer is written straight into a chapter | Only `[UD]` then `[UK]` write into the vault |
+| A skipped question is asked again | A skip is final |
+| A question whose answer is in the code | Read the file instead of asking |
 
----
+These restate rules of the original keeper (its workflows, its state rules and its vault conventions) as mistakes to avoid.
 
-## Resumability
+## Not yet proven
 
-Each step is fully resumable:
-- Step 1 → can re-run analysis with different ranking
-- Step 2 → can edit questions before presenting
-- Step 3 → can switch from chat to transcript mid-run
-- Step 4 → can approve/skip per integration proposal
+- The queued-question path (`di_candidate`) has been used rarely; the filter on `status` and `kind` is the part that was found necessary.
+- The interview has not been run with the roles table of `_meta/roles-and-sources.md` filled in by a team.
 
----
+## Validation checklist
 
-## Hard Rules (CRITICAL)
+Before declaring the `[DI]` closed:
 
-These rules govern every file this workflow writes into `core_knowledge/`. Inherited from Kipi persona (`_bmad/kipi/SKILL.md`).
+- [ ] The rubric was applied to **all** of `{{VAULT_DIR}}`, not only to recent sections
+- [ ] The 10 gaps do not all come from the same section (or it is justified)
+- [ ] Every "why" is concrete, not "seems incomplete"
+- [ ] Exactly 10 questions, one per gap, each with its destination chapter
+- [ ] No question is answered by reading a file
+- [ ] Both channels (chat or a file in `{{RAW_NOTES_DIR}}/`) and the option to skip were announced explicitly
+- [ ] Every answer has channel, date and author role label
+- [ ] Verbatim answers are **only** in `{{RAW_NOTES_DIR}}/`, zero lines written in `{{VAULT_DIR}}`
+- [ ] Answers in conflict with the vault are listed as open items, not applied
+- [ ] Skipped questions were not raised again
+- [ ] `{{KIPI_STATE_DIR}}/state/<slug>.json` updated with the outcome and the raw file produced
 
-1. **Names of people** appear ONLY in `core_knowledge/team_and_stakeholders/`. When an answer mentions a person, the integration step extracts identity (name, contact, role) into `team_and_stakeholders/contacts.md` or `ownership-map.md`, and uses ROLE in the technical knowledge file.
-2. **No `private_knowledge/` references** in `core_knowledge/`. The transcript stays in `private_knowledge/raw_data/meetings_transcripts/`. The digested knowledge is self-contained.
-3. **Verbatim answers stay in the sidecar log** (`_bmad/_memory/kipi-sidecar/developer-interview/...`), not in `core_knowledge/`.
-4. **Self-check before writing** — every proposed `core_knowledge/` file is scanned for human names outside `team_and_stakeholders/` and any `private_knowledge` paths; redact, reroute, or refuse to write if found.
-
----
-
-## Completion
-
-When Step 4 completes:
-1. Validate against checklist
-2. Set workflow state to completed
-3. Show completion report:
-   - Questions answered / skipped
-   - Files updated / created in `core_knowledge/`
-   - Identity-bearing content routed into `team_and_stakeholders/`
-   - Sidecar log path (where verbatim answers live)
-4. Return to Kipi menu
-
----
-
-## Error Handling
-
-- **Transcript file not found:** Inform user, ask for correct filename or fall back to chat
-- **Answer parsing ambiguous:** Ask the user to clarify per-question
-- **User skips all 10 questions:** Save state, return to menu, no `core_knowledge/` writes
-- **Self-check fails on integration:** Surface the violation, ask user how to handle (rewrite / route / drop)
+Typical failures: generating the questions before the list of gaps is approved; treating a spoken answer as a requirement; writing into a chapter without going through `[UK]`.
