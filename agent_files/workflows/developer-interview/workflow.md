@@ -1,6 +1,6 @@
 # Workflow `[DI]`: Developer Interview
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: gap rubric read from the vault's own signals, answers are indications to validate.
+> Modified in `LairdLuca/kipi-agent`: gap rubric read from the vault's own signals, answers are indications to validate.
 
 Rewritten on the signals of this vault: the gap rubric and the rules on answers are NOT upstream's.
 

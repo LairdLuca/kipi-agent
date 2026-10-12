@@ -5,7 +5,7 @@ description: Companion skill for Kipi. Use after another agent makes code change
 
 # Kipi: Update Knowledge (light entry)
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: keepers in parallel by messages, applies then reports, no questions asked.
+> Modified in `LairdLuca/kipi-agent`: keepers in parallel by messages, applies then reports, no questions asked.
 
 This skill runs the `[UK]` workflow of Kipi without loading the persona, the menu and the full state. It serves whoever has just finished a piece of work (a development agent, a tab of herdr (<https://herdr.dev>, a terminal workspace manager) before a `/clear`, the human in chat) and needs what emerged to reach the vault.
 

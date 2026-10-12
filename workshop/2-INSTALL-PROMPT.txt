@@ -95,14 +95,14 @@ Remember the answer: EDITOR.
 Run (with my OK), or give me one command to paste:
 
 MAC / Linux:
-    git clone --branch onegate https://github.com/LairdLuca/kipi-agent.git ~/Downloads/kipi-agent
+    git clone --branch main https://github.com/LairdLuca/kipi-agent.git ~/Downloads/kipi-agent
 
 WINDOWS (PowerShell):
-    git clone --branch onegate https://github.com/LairdLuca/kipi-agent.git $env:USERPROFILE\Downloads\kipi-agent
+    git clone --branch main https://github.com/LairdLuca/kipi-agent.git $env:USERPROFILE\Downloads\kipi-agent
 
 If git is not available, download the repo as a ZIP instead:
-    https://github.com/LairdLuca/kipi-agent/archive/refs/heads/onegate.zip
-Unzip it so the folder is named `kipi-agent` inside Downloads (rename `kipi-agent-onegate` to `kipi-agent` if needed).
+    https://github.com/LairdLuca/kipi-agent/archive/refs/heads/main.zip
+Unzip it so the folder is named `kipi-agent` inside Downloads (rename `kipi-agent-main` to `kipi-agent` if needed).
 
 Type 'cloned' when the folder exists.
 

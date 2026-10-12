@@ -1,20 +1,20 @@
 # Kipi — Core-Knowledge Keeper
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: a section about this branch at the top, and the sections below corrected for what the branch does.
+> Modified in `LairdLuca/kipi-agent`: a section about this fork at the top, and the sections below corrected for what the fork does.
 
-Kipi manages repository documentation, systematic knowledge organization, and intelligent file processing. It scans your codebase, builds deep documentation organized into chapters, processes the notes you drop into a folder, and keeps everything in sync as your code evolves. Upstream it is a BMad module; on this branch BMad is optional.
+Kipi manages repository documentation, systematic knowledge organization, and intelligent file processing. It scans your codebase, builds deep documentation organized into chapters, processes the notes you drop into a folder, and keeps everything in sync as your code evolves. Upstream it is a BMad module; on this fork BMad is optional.
 
 ---
 
-## About this branch (`onegate`)
+## About this fork
 
-This branch is upstream's Kipi with the author's modifications inside it: the same `agent_files/` brain, the same folders, the same capability codes and the same installer, with a different vault contract, a different way to keep the vault current, and an install that asks first. It is used by [onegate](https://github.com/LairdLuca/onegate), a working configuration for Claude Code that installs it into a project after a short interview, and it can also be installed by hand (below). The `main` branch of this fork is identical to upstream.
+This fork is upstream's Kipi with the author's modifications inside it, on `main`: the same `agent_files/` brain, the same folders, the same capability codes and the same installer, with a different vault contract, a different way to keep the vault current, and an install that asks first. It is used by [onegate](https://github.com/LairdLuca/onegate), a working configuration for Claude Code that installs it into a project after a short interview, and it can also be installed by hand (below). Upstream's own Kipi, unmodified, is [`ladymeyy/kipi-agent`](https://github.com/ladymeyy/kipi-agent).
 
-**Version 1.1.0** of this branch (tagged `onegate-v1.1.0`), see the [changelog](CHANGELOG.md).
+**Version 1.1.1** of this fork (tagged `onegate-v1.1.1`), see the [changelog](CHANGELOG.md).
 
 ### How it differs from upstream's `main`
 
-| | upstream `main` | this branch |
+| | upstream `main` | this fork's `main` |
 |---|---|---|
 | Requires BMad | yes, it refuses to activate without it | no: BMad is optional and its config is read only when it is installed |
 | Shape | `agent_files/` copied into `_bmad/kipi/`, with per-editor stubs | the same layout, copied into one Kipi folder of your choice (`_bmad/kipi/` when you use BMad) |
@@ -67,25 +67,25 @@ If a workflow later finds a folder or file it needs missing, it says which one, 
 
 ### Files changed
 
-Each file whose content changed carries one line after its title: "Modified on the branch `onegate` of `LairdLuca/kipi-agent`: ...". These carry none, so they are listed here:
+Each file whose content changed carries one line after its title: "Modified in `LairdLuca/kipi-agent`: ...". These carry none, so they are listed here:
 
 - the 16 editor skill stubs, the 4 editor commands and the 4 editor READMEs under `agent_files/ide_adapters/` (the path of the Kipi folder is the only change, plus one sentence in the READMEs and, for the update stub and command, no persona);
 - `workshop/2-INSTALL-PROMPT.txt` and `workshop/3-AGENT-BUILDER-PROMPT.txt`, which are pasted whole into a chat, and `docs/folder-structure.excalidraw`, which is JSON;
-- the files this branch adds: `agent_files/workflows/capture.md`, `agent_files/templates/conventions-template.md`, `agent_files/ide_adapters/claude-code/commands/kipi-update.md` (the alias `/kipi-update` of `/kipi-update-core`, Claude Code only) and `CHANGELOG.md` (the versions of this branch).
+- the files this fork adds: `agent_files/workflows/capture.md`, `agent_files/templates/conventions-template.md`, `agent_files/ide_adapters/claude-code/commands/kipi-update.md` (the alias `/kipi-update` of `/kipi-update-core`, Claude Code only) and `CHANGELOG.md` (the versions of this fork).
 
 The 29 files of upstream's folder-contract vault (the step files of the four workflows, the checklists, the batching config, the state schema and twelve templates) are removed: their work is done by the moved workflows. `LICENSE` has one holder line added, and the seven `bmad-skill-manifest.yaml` files are unchanged.
 
 ### Credits and license
 
-Kipi, its name, its capability menu, its folder layout and its installer come from [`ladymeyy/kipi-agent`](https://github.com/ladymeyy/kipi-agent) (MIT). The upstream author is credited here with thanks. The license is MIT: the upstream notice is kept unchanged in `LICENSE`, with one holder line added for the additions of this branch.
+Kipi, its name, its capability menu, its folder layout and its installer come from [`ladymeyy/kipi-agent`](https://github.com/ladymeyy/kipi-agent) (MIT). The upstream author is credited here with thanks. The license is MIT: the upstream notice is kept unchanged in `LICENSE`, with one holder line added for the additions of this fork.
 
-Where the files say "the original keeper", they mean the private keeper this branch was generalized from, not upstream.
+Where the files say "the original keeper", they mean the private keeper this fork was generalized from, not upstream.
 
 ---
 
 ## Workshop
 
-For a guided install of this branch (Node.js, Kipi, and BMad if you want it) and a custom-agent building exercise, start at **[START_HERE.md](START_HERE.md)** and use the files in `workshop/`. The install prompt clones the branch `onegate` of this repository.
+For a guided install of this fork (Node.js, Kipi, and BMad if you want it) and a custom-agent building exercise, start at **[START_HERE.md](START_HERE.md)** and use the files in `workshop/`. The install prompt clones `main` of this repository.
 
 ---
 
@@ -226,6 +226,6 @@ kipi-agent/
 
 - Agents other than Claude Code (the skills are plain markdown, but only Claude Code has run them).
 - A fresh install on a real project, or with another editor. The first start ran with Claude Code on two toy projects installed by onegate. After a yes, the state files, the writes under the editor's folders and to the rules file, and the removal of the install line from the main skill were not stopped by the permission check; after a no, nothing was written and no state folder was created. A permission check that refuses one of those writes has not been met. The copy of the vault skeleton by `[RI]` is written, not exercised.
-- The single-branch path: only the multi-branch mechanics ran on a real project, in the keeper this branch generalizes.
+- The single-branch path: only the multi-branch mechanics ran on a real project, in the keeper this fork generalizes.
 - Two keepers working at once with the message protocol of `kipi-update-core`.
 - The in-repo layout (vault and state inside the code repository) ran only an install by onegate and a first start answered no, on a toy project; no workflow has run in it. A code repository beside the workspace rather than inside it has not run.

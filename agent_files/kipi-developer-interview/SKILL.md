@@ -5,7 +5,7 @@ description: "Run a 10-question developer interview to fill knowledge gaps in Co
 
 # Kipi — Developer Interview
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: the gap rubric is read from the vault's own signals, and the interview writes nothing into the vault.
+> Modified in `LairdLuca/kipi-agent`: the gap rubric is read from the vault's own signals, and the interview writes nothing into the vault.
 
 ## Overview
 

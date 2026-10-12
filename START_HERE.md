@@ -1,6 +1,6 @@
 # Start here
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: the workshop installs this branch, BMad is optional, and the install asks before it writes.
+> Modified in `LairdLuca/kipi-agent`: the workshop installs this fork, BMad is optional, and the install asks before it writes.
 
 ## Workshop participants
 
@@ -8,7 +8,7 @@
 2. Copy all of [workshop/2-INSTALL-PROMPT.txt](workshop/2-INSTALL-PROMPT.txt) into a new IDE chat in your project
 3. After install, use [workshop/3-AGENT-BUILDER-PROMPT.txt](workshop/3-AGENT-BUILDER-PROMPT.txt) for the custom-agent exercise (it needs BMad: say yes to it in the install chat)
 
-No advance setup required: the install prompt walks you through Node.js and Kipi, and through BMad if you want it. It installs this branch of Kipi (`onegate`), not upstream's `main`.
+No advance setup required: the install prompt walks you through Node.js and Kipi, and through BMad if you want it. It installs this fork of Kipi (`LairdLuca/kipi-agent`, its `main`), not upstream's own Kipi.
 
 ## Manual install (developers)
 

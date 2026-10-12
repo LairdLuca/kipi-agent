@@ -1,4 +1,4 @@
-Modified on the branch `onegate` of `LairdLuca/kipi-agent`: the chat installs Node.js and Kipi, and BMad only if you ask for it.
+Modified in `LairdLuca/kipi-agent`: the chat installs Node.js and Kipi, and BMad only if you ask for it.
 WELCOME TO THE WORKSHOP — read this first (15 seconds).
 
 You don't need to install anything in advance. The AI does it for you.

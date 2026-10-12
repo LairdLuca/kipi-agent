@@ -1,6 +1,6 @@
 # Workflow `[CS]`: Code Scan & Document
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: one chapter per run, capture by git branch, oversized sources declared.
+> Modified in `LairdLuca/kipi-agent`: one chapter per run, capture by git branch, oversized sources declared.
 
 Goal: fill one chapter, or one variant file, with deep content backed by source reads. Load `{{KIPI_HOME}}/workflows/capture.md`.
 

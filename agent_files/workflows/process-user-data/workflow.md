@@ -1,6 +1,6 @@
 # Workflow `[UD]`: Process User Data (the raw-notes inbox)
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: the raw-notes pipeline with a ledger, an append-only archive and a source status by channel.
+> Modified in `LairdLuca/kipi-agent`: the raw-notes pipeline with a ledger, an append-only archive and a source status by channel.
 
 Goal: turn the raw inputs dropped into `{{RAW_NOTES_DIR}}/` into structured extractions ready to fold into chapters.
 

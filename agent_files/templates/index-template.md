@@ -1,6 +1,6 @@
 # Knowledge vault: index
 
-<!-- Modified on the branch `onegate` of `LairdLuca/kipi-agent`: codes renamed to this branch's menu, and no link to a file that exists only in the vault. -->
+<!-- Modified in `LairdLuca/kipi-agent`: codes renamed to this fork's menu, and no link to a file that exists only in the vault. -->
 
 This is the router of the vault: read it first, then open only the chapters your request needs. Writing rules: `_meta/conventions.md`. Knowledge enters this vault only through Kipi's workflows.
 

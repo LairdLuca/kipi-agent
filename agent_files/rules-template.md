@@ -2,7 +2,7 @@
 # Managed by Kipi (`/kipi-install`). Edit by re-running install or by toggling the
 # block manually between the start/end markers. Content outside the markers is
 # preserved on every Kipi run.
-# Modified on the branch `onegate` of `LairdLuca/kipi-agent`: the vault of this branch, a closed write list, the raw-notes pipeline.
+# Modified in `LairdLuca/kipi-agent`: the vault of this fork, a closed write list, the raw-notes pipeline.
 
 ## Knowledge Verification Protocol (CRITICAL)
 

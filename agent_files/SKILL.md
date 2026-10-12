@@ -5,7 +5,7 @@ description: Core-Knowledge Keeper for a project's knowledge vault. Use when the
 
 # Kipi: Core-Knowledge Keeper
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: paths as placeholders, capture by git branch, a state folder of its own, keepers in parallel, no BMad requirement, the vault contract of this branch, and an install that asks at the first start.
+> Modified in `LairdLuca/kipi-agent`: paths as placeholders, capture by git branch, a state folder of its own, keepers in parallel, no BMad requirement, the vault contract of this fork, and an install that asks at the first start.
 KIPI-NOT-INSTALLED: Kipi's stubs, commands and rules block are not installed yet. At this activation, before anything else, read {{KIPI_HOME}}/kipi-install/SKILL.md, show its install plan and ask before writing anything. When the install has succeeded, delete this whole line from this file.
 
 ## Overview
@@ -155,7 +155,7 @@ While running a workflow, when a folder or a file the workflow needs does not ex
 
 - a missing stub, command or rules block: `{{KIPI_HOME}}/kipi-install/SKILL.md` repairs it from the brain (the file `ide-resolved.yaml` in `{{KIPI_HOME}}` says what was installed);
 - a missing state file or folder after a no to the install plan (the install line is still in this file and no state exists): nothing is created before the plan's yes, so offer `{{KIPI_HOME}}/kipi-install/SKILL.md` again; once it is applied, the missing state files are created as in "First use";
-- a missing file of the brain itself, anything under `{{KIPI_HOME}}/`: Kipi cannot restore it from itself. Name the file and ask the person to copy `agent_files/` again from the branch `onegate` of `LairdLuca/kipi-agent`.
+- a missing file of the brain itself, anything under `{{KIPI_HOME}}/`: Kipi cannot restore it from itself. Name the file and ask the person to copy `agent_files/` again from `LairdLuca/kipi-agent`.
 
 Never reconstruct the missing text from memory. This is the only check of the install outside the first start.
 
@@ -197,7 +197,7 @@ Each capability is one folder under `{{KIPI_HOME}}/`; its `SKILL.md` is the entr
 | The sensitive-data pass is skipped because the first pass found a lot | It is never skipped |
 | A chapter is declared `current` while a source it affirms (even by absence) is not in `source_files` | A statement of absence is content asserted: its file or folder is a source |
 
-These restate rules of the keeper this branch generalizes (its workflows, its state rules and its vault conventions) as mistakes to avoid.
+These restate rules of the keeper this fork generalizes (its workflows, its state rules and its vault conventions) as mistakes to avoid.
 
 ## Not yet proven
 
@@ -205,7 +205,7 @@ These restate rules of the keeper this branch generalizes (its workflows, its st
 - The first-use creation of the state files ran once, with Claude Code, on a toy project installed by onegate (one variant, `state/<slug>.json` named after it); not on a real project. The copy of the vault skeleton by `[RI]` is written, not exercised.
 - The single-branch path has not run on a real project: only the multi-branch mechanics ran on one.
 - Two keepers running together (the protocol of `kipi-update-core`) have not been observed.
-- The in-repo layout (vault and state inside the code repository) ran only an install by onegate and a first start answered no, on a toy project; no workflow has run in it. A code repository beside the workspace rather than inside it has not run. The keeper this branch generalizes ran with the vault in a workspace that holds the code repository as a nested repository.
+- The in-repo layout (vault and state inside the code repository) ran only an install by onegate and a first start answered no, on a toy project; no workflow has run in it. A code repository beside the workspace rather than inside it has not run. The keeper this fork generalizes ran with the vault in a workspace that holds the code repository as a nested repository.
 - The first start ran with Claude Code on two toy projects installed by onegate. After a yes, the writes under the editor's folders and to the rules file, and the removal of the install line from this file, were not stopped by the permission check; after a no, nothing was written and no state folder was created. A permission check that refuses one of those writes has not been met.
 - The repair proposal when a file a workflow needs is missing ran in two fresh sessions (`[CS]` and `[UK]`, with `workflows/capture.md` removed). Both times the person declined, so the copy by hand of a missing file of the brain has not been run.
 

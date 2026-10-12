@@ -1,6 +1,6 @@
 # Workflow `[RI]`: Repository Initialize
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: copies the vault skeleton and creates the folders of first use; there is no scan and no proposal of a structure.
+> Modified in `LairdLuca/kipi-agent`: copies the vault skeleton and creates the folders of first use; there is no scan and no proposal of a structure.
 
 Goal: give an empty vault the two files the other capabilities rely on, a router and a contract. The sections of the vault are not decided here: they are the project's own and are added by `[CS]`.
 
@@ -29,7 +29,7 @@ Goal: give an empty vault the two files the other capabilities rely on, a router
 | `[RI]` runs on a vault that has chapters | It never does: say that the vault is initialized, or stop and ask |
 | The state folder is recreated and a line of another session is lost | Create only what is missing |
 
-These restate rules of the keeper this branch generalizes (its state rules and its vault conventions) as mistakes to avoid.
+These restate rules of the keeper this fork generalizes (its state rules and its vault conventions) as mistakes to avoid.
 
 ## Not yet proven
 

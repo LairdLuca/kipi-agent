@@ -5,7 +5,7 @@ description: "Deep scan repository and create comprehensive documentation. Use w
 
 # Kipi — Code Scan Document
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: the steps live in one workflow file, capture is by git branch, state is the state file of the branch.
+> Modified in `LairdLuca/kipi-agent`: the steps live in one workflow file, capture is by git branch, state is the state file of the branch.
 
 ## Overview
 

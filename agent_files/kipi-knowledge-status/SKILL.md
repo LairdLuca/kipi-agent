@@ -5,7 +5,7 @@ description: "Display Core-Knowledge status and coverage overview. Use when Kipi
 
 # Workflow `[ST]`: Status
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: status by git ref, one screen, writes nothing.
+> Modified in `LairdLuca/kipi-agent`: status by git ref, one screen, writes nothing.
 
 One-screen report. Writes nothing. Sources: chapter frontmatters, `chapters.json`, `vault.json`; staleness evaluated by git ref (`{{KIPI_HOME}}/workflows/capture.md` section 3), with the reference and its commit declared.
 

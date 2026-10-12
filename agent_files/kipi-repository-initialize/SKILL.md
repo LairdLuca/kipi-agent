@@ -5,7 +5,7 @@ description: "Initialize Core-Knowledge structure for a repository. Use when Kip
 
 # Kipi — Repository Initialize
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: it copies the vault skeleton into an empty vault instead of scanning and proposing a structure.
+> Modified in `LairdLuca/kipi-agent`: it copies the vault skeleton into an empty vault instead of scanning and proposing a structure.
 
 ## Overview
 

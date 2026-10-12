@@ -5,7 +5,7 @@ description: "Process files dropped in the raw-notes inbox into structured extra
 
 # Kipi — Process User Data
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: the inbox is the raw-notes folder, with a ledger, an append-only archive and a source status by channel.
+> Modified in `LairdLuca/kipi-agent`: the inbox is the raw-notes folder, with a ledger, an append-only archive and a source status by channel.
 
 ## Overview
 

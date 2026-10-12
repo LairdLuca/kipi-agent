@@ -1,4 +1,4 @@
-# Modified on the branch `onegate` of `LairdLuca/kipi-agent`: classification table with a source-status column that applies section 1.1 of _meta/conventions.md (the channel decides the status of the information).
+# Modified in `LairdLuca/kipi-agent`: classification table with a source-status column that applies section 1.1 of _meta/conventions.md (the channel decides the status of the information).
 # Target chapters are described by role (the chapter of the concept touched), never by a fixed section number: each vault names its own sections in index.md.
 # Used by [UD] Process User Data (the raw-notes inbox) as a first attempt at classification. Low confidence or an unrecognised pattern means ask, never guess. Cells hold no commas; ; separates the items of a list.
 type_id,name,file_name_pattern,target_chapter,source_status,what_to_extract,priority,auto_classify

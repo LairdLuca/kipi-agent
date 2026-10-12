@@ -5,7 +5,7 @@ description: "Install or repair Kipi for the editors in use. Use when Kipi's fir
 
 # Kipi — Install (IDE adapter)
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: it asks before writing, BMad is optional, an existing stub or command is never overwritten, the install line is deleted as the last step, the counts are true.
+> Modified in `LairdLuca/kipi-agent`: it asks before writing, BMad is optional, an existing stub or command is never overwritten, the install line is deleted as the last step, the counts are true.
 
 ## Overview
 
@@ -32,7 +32,7 @@ There is no silent path and no check of the install at activation.
 
 ### Step 1: Resolve the workspace and the brain
 
-- Confirm `{{KIPI_HOME}}/SKILL.md` exists (Kipi's brain has been copied in). If missing → tell the user: "Copy `agent_files/` from the branch `onegate` of `LairdLuca/kipi-agent` to `{{KIPI_HOME}}` first, then re-run install." and stop.
+- Confirm `{{KIPI_HOME}}/SKILL.md` exists (Kipi's brain has been copied in). If missing → tell the user: "Copy `agent_files/` from `LairdLuca/kipi-agent` to `{{KIPI_HOME}}` first, then re-run install." and stop.
 - The workspace is `{{WORKSPACE}}`: every target path below is relative to it.
 
 ### Step 2: Detect the editors

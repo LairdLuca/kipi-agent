@@ -5,7 +5,7 @@ description: "Run maintenance and cleanup on Core-Knowledge. Use when Kipi selec
 
 # Workflow `[CL]`: Vault Audit and Maintenance
 
-> Modified on the branch `onegate` of `LairdLuca/kipi-agent`: audit against the conventions of this vault, three passes, proposals only.
+> Modified in `LairdLuca/kipi-agent`: audit against the conventions of this vault, three passes, proposals only.
 
 The structure contract that is verified is **not** upstream's (`core_knowledge/` + `private_knowledge/`, folder contracts, `_about.md`): it is `{{VAULT_DIR}}/_meta/conventions.md`, the constitution of this vault.
 
